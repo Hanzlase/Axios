@@ -93,6 +93,7 @@ class ChatService:
             order = ["openrouter", "cohere"]
 
         last_error: Exception | None = None
+        fell_back_from_openrouter = False
 
         for provider in order:
             try:
@@ -106,6 +107,7 @@ class ChatService:
                 if provider == "cohere":
                     if not self._settings.cohere_api_key:
                         raise RuntimeError("Cohere API key is not configured")
+
                     async for t in self._stream_cohere_tokens(user_message, retrieved_context, history):
                         yield t
                     return
@@ -115,6 +117,7 @@ class ChatService:
                 last_error = exc
                 # Only fall through on rate limits / transient upstream errors.
                 if provider == "openrouter" and self._is_openrouter_rate_limit(exc):
+                    fell_back_from_openrouter = True
                     logger.warning("openrouter_rate_limited_falling_back", error=str(exc))
                     continue
                 # For other errors, don't silently switch providers.
