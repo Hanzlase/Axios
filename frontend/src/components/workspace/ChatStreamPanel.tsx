@@ -357,7 +357,7 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
                     ...entry,
                     content:
                       entry.content ||
-                      "No model output was produced. Verify retrieval state and OpenRouter configuration.",
+                      "I couldn't generate a response right now. Please try again in a moment.",
                   }
                 : entry,
             ),
