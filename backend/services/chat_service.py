@@ -290,6 +290,7 @@ class ChatService:
                     raise RuntimeError(f"Cohere error {response.status_code}: {detail[:1000]}")
 
                 data_lines: list[str] = []
+                saw_any_text = False
 
                 async for line in response.aiter_lines():
                     if line is None:
@@ -320,14 +321,8 @@ class ChatService:
                             continue
 
                         delta_text: str | None = None
-
                         if isinstance(parsed, dict):
                             ptype = parsed.get("type")
-
-                            # Common Cohere v2 shapes (be liberal in what we accept)
-                            # 1) {"type":"content_delta","delta":{"text":"..."}}
-                            # 2) {"type":"message_delta","delta":{"content":[{"type":"text","text":"..."}]}}
-                            # 3) {"type":"text-generation","delta":{"text":"..."}}
                             delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
 
                             if ptype in {"content_delta", "text-generation"}:
@@ -340,30 +335,45 @@ class ChatService:
                                     if isinstance(first, dict):
                                         delta_text = first.get("text") or first.get("delta")
 
-                            # Some payloads nest text at top-level
-                            if delta_text is None:
-                                delta_text = parsed.get("text") if isinstance(parsed.get("text"), str) else None
+                            if delta_text is None and isinstance(parsed.get("text"), str):
+                                delta_text = parsed.get("text")
 
                         if delta_text:
+                            saw_any_text = True
                             yield str(delta_text)
 
-                # Flush any trailing data block if the stream ended without a blank line.
-                if data_lines:
-                    raw = "\n".join(data_lines).strip()
-                    if raw and raw != "[DONE]":
-                        try:
-                            parsed = json.loads(raw)
-                        except json.JSONDecodeError:
-                            parsed = None
+                # If Cohere returned 200 but we never extracted any streamed text,
+                # fall back to a non-streaming call to guarantee an answer.
+                if not saw_any_text:
+                    try:
+                        non_stream_payload = {**payload, "stream": False}
+                        r = await client.post(endpoint, headers=headers, json=non_stream_payload)
+                        if r.status_code >= 400:
+                            detail = r.text
+                            raise RuntimeError(f"Cohere error {r.status_code}: {detail[:1000]}")
+                        parsed = r.json()
+
+                        final_text: str | None = None
                         if isinstance(parsed, dict):
-                            delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
-                            text = (
-                                (delta.get("text") or delta.get("content"))
-                                if isinstance(delta, dict)
-                                else None
-                            )
-                            if isinstance(text, str) and text:
-                                yield text
+                            # Common: {"message": {"content": [{"type":"text","text":"..."}]}}
+                            msg = parsed.get("message") or {}
+                            content = msg.get("content")
+                            if isinstance(content, list) and content:
+                                first = content[0] or {}
+                                if isinstance(first, dict) and isinstance(first.get("text"), str):
+                                    final_text = first.get("text")
+
+                            # Fallbacks
+                            if final_text is None and isinstance(parsed.get("text"), str):
+                                final_text = parsed.get("text")
+                            if final_text is None and isinstance(parsed.get("response"), str):
+                                final_text = parsed.get("response")
+
+                        if final_text:
+                            yield str(final_text)
+                    except Exception:
+                        # If even non-streaming fails, we leave it to caller which will emit error.
+                        logger.exception("cohere_non_stream_fallback_failed")
 
 
 _CHAT_SERVICE = ChatService()

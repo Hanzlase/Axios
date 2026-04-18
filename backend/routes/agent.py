@@ -148,7 +148,7 @@ async def _agent_stream(req: AgentStreamRequest):
 
 
 @router.post("/api/agent/stream")
-async def agent_stream(payload: AgentStreamRequest = Body(..., embed=True)):
+async def agent_stream(payload: AgentStreamRequest = Body(...)):
     return StreamingResponse(
         _agent_stream(payload),
         media_type="text/event-stream",
