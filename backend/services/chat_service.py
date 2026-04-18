@@ -253,8 +253,7 @@ class ChatService:
         retrieved_context: str,
         history: list[ChatMessage] | None = None,
     ) -> AsyncIterator[str]:
-        # Cohere v2 streaming uses SSE lines like: event: message
-        # We'll parse JSON payloads and emit text deltas.
+        # Cohere v2 streaming uses SSE. We'll parse JSON payloads and emit text deltas.
         messages = self._build_messages(user_message, retrieved_context, history)
 
         # Map OpenAI-style messages into a single prompt for Cohere.
@@ -290,61 +289,81 @@ class ChatService:
                     detail = body.decode("utf-8", errors="replace")
                     raise RuntimeError(f"Cohere error {response.status_code}: {detail[:1000]}")
 
-                event: str | None = None
                 data_lines: list[str] = []
 
                 async for line in response.aiter_lines():
                     if line is None:
                         continue
 
+                    # Ignore event lines; we rely on the JSON 'type' field.
                     if line.startswith("event:"):
-                        event = line.removeprefix("event:").strip()
                         continue
 
                     if line.startswith("data:"):
                         data_lines.append(line.removeprefix("data:").strip())
                         continue
 
-                    # blank line means end of event block
+                    # Blank line => end of SSE event block.
                     if line == "":
                         if not data_lines:
-                            event = None
                             continue
 
                         raw = "\n".join(data_lines).strip()
                         data_lines = []
 
-                        if raw == "[DONE]":
+                        if not raw or raw == "[DONE]":
                             break
 
                         try:
                             parsed = json.loads(raw)
                         except json.JSONDecodeError:
-                            event = None
                             continue
 
-                        # Cohere v2 emits 'delta' text in different event shapes.
-                        # Handle common ones defensively.
-                        delta_text = None
+                        delta_text: str | None = None
+
                         if isinstance(parsed, dict):
-                            # e.g. {"type":"content_delta","delta":{"text":"..."}}
-                            if parsed.get("type") in {"content_delta", "text-generation"}:
-                                delta = parsed.get("delta") or {}
+                            ptype = parsed.get("type")
+
+                            # Common Cohere v2 shapes (be liberal in what we accept)
+                            # 1) {"type":"content_delta","delta":{"text":"..."}}
+                            # 2) {"type":"message_delta","delta":{"content":[{"type":"text","text":"..."}]}}
+                            # 3) {"type":"text-generation","delta":{"text":"..."}}
+                            delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
+
+                            if ptype in {"content_delta", "text-generation"}:
                                 delta_text = delta.get("text") or delta.get("content")
 
-                            # e.g. {"message":{"content":[{"type":"text","text":"..."}]}}
-                            if delta_text is None and "message" in parsed:
-                                msg = parsed.get("message") or {}
-                                content = msg.get("content") or []
-                                if content and isinstance(content, list):
-                                    first = content[0] or {}
+                            if delta_text is None and ptype in {"message_delta", "message"}:
+                                content = delta.get("content") or (parsed.get("message") or {}).get("content")
+                                if isinstance(content, list) and content:
+                                    first = content[0]
                                     if isinstance(first, dict):
-                                        delta_text = first.get("text")
+                                        delta_text = first.get("text") or first.get("delta")
+
+                            # Some payloads nest text at top-level
+                            if delta_text is None:
+                                delta_text = parsed.get("text") if isinstance(parsed.get("text"), str) else None
 
                         if delta_text:
                             yield str(delta_text)
 
-                        event = None
+                # Flush any trailing data block if the stream ended without a blank line.
+                if data_lines:
+                    raw = "\n".join(data_lines).strip()
+                    if raw and raw != "[DONE]":
+                        try:
+                            parsed = json.loads(raw)
+                        except json.JSONDecodeError:
+                            parsed = None
+                        if isinstance(parsed, dict):
+                            delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
+                            text = (
+                                (delta.get("text") or delta.get("content"))
+                                if isinstance(delta, dict)
+                                else None
+                            )
+                            if isinstance(text, str) and text:
+                                yield text
 
 
 _CHAT_SERVICE = ChatService()

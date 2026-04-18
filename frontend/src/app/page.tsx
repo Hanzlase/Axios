@@ -245,24 +245,6 @@ export default function LandingPage() {
           .ax-grid,.ax-marquee,.ax-pulse { animation:none !important; }
           .ax-card-3d { transform:none !important; transition:none !important; }
         }
-
-        /* ── Mobile tuning ── */
-        @media (max-width: 640px) {
-          .ax-cap-row { padding: 1.1rem 0.75rem; }
-          .ax-step-num-bg { font-size: 7.25rem; top: 0.6rem; }
-
-          /* Hero + demo card specifically */
-          .ax-card-3d { transform: none !important; }
-          .ax-demo-card { max-width: 20rem; margin-left: auto; margin-right: auto; }
-          .ax-demo-tabs { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-          .ax-demo-tab { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
-          .ax-demo-body { padding: 0.85rem !important; gap: 0.75rem !important; }
-          .ax-demo-toolbar { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
-        }
-
-        @media (max-width: 420px) {
-          .ax-demo-card { max-width: 19rem; }
-        }
       `}</style>
 
       {/* Ambient grid */}
@@ -300,44 +282,54 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* HERO                                                */}
       {/* ════════════════════════════════════════════════════ */}
-      <header className="relative mx-auto max-w-6xl px-6 pt-16 pb-14 sm:pt-20 sm:pb-16 md:pt-32 md:pb-20">
+      <header className="relative mx-auto max-w-6xl px-6 pt-24 pb-16 md:pt-32 md:pb-20">
         {/* Faded star watermark */}
-        <div aria-hidden="true" className="pointer-events-none absolute -right-8 top-8 select-none opacity-[0.035] dark:opacity-[0.06] hidden sm:block">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-8 top-8 select-none opacity-[0.035] dark:opacity-[0.06]">
           <svg width="440" height="440" viewBox="0 0 24 24" fill="var(--ax-text)" aria-hidden="true">
             <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
           </svg>
         </div>
 
-        <div className="grid gap-8 sm:gap-12 md:gap-14 md:grid-cols-[1fr_400px] md:items-start">
+        <div className="grid gap-14 md:grid-cols-[1fr_400px] md:items-start">
 
           {/* LEFT */}
           <div>
             <Reveal delayMs={0}>
               <div className="inline-flex items-center gap-2.5 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3.5 py-1.5 shadow-[var(--ax-shadow-sm)]">
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
+                <span className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">Local-first · Session-scoped · Production ready</span>
               </div>
             </Reveal>
 
+            <Reveal delayMs={65}>
+              <h1 className="ax-fraunces mt-7 text-[3.1rem] font-light leading-[1.06] tracking-[-0.03em] sm:text-[4rem] md:text-[4.75rem]">
+                Understand<br />
+                <em className="font-normal" style={{ fontVariationSettings: "'opsz' 72" }}>complex documents</em><br />
+                with structured<br />
+                <em className="font-normal text-[var(--ax-text-secondary)]">outputs.</em>
+              </h1>
+            </Reveal>
+
             <Reveal delayMs={130}>
-              <p className="ax-syne mt-5 sm:mt-7 mx-auto max-w-[20rem] sm:mx-0 sm:max-w-[22rem] text-[0.9rem] sm:text-[0.9125rem] leading-[1.75] sm:leading-[1.85] text-[var(--ax-text-secondary)]">
+              <p className="ax-syne mt-7 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
                 Axion turns your files into explanations, quizzes, flashcards, and study plans. No noisy dashboards — just a clean workspace for thinking.
               </p>
             </Reveal>
 
             <Reveal delayMs={200}>
-              <div className="mt-6 sm:mt-8 mx-auto flex max-w-[20rem] flex-col items-stretch gap-3 sm:mx-0 sm:max-w-none sm:flex-row sm:items-center">
-                <Link href="/workspace" className="ax-lift ax-syne inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link href="/workspace" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
                   Open workspace
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
-                <Link href="#workflow" className="ax-lift ax-syne inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
+                <Link href="#workflow" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
                   How it works
                 </Link>
               </div>
             </Reveal>
 
             <Reveal delayMs={265}>
-              <div className="mt-7 sm:mt-8 mx-auto flex max-w-[20rem] flex-wrap justify-center gap-2 sm:mx-0 sm:max-w-none sm:justify-start">
+              <div className="mt-8 flex flex-wrap gap-2">
                 {["RAG over your docs", "Multi-agent routing", "Exportable outputs"].map((t) => (
                   <span key={t} className="ax-mono rounded-full border border-[var(--ax-border)] px-3 py-1 text-[0.67rem] text-[var(--ax-text-tertiary)]">{t}</span>
                 ))}
@@ -347,7 +339,7 @@ export default function LandingPage() {
 
           {/* RIGHT — 3-D product card */}
           <Reveal delayMs={150} className="md:pt-2">
-            <div className="ax-demo-card ax-card-3d ax-shadow-deep mx-auto w-full max-w-[20rem] sm:max-w-none rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
+            <div className="ax-card-3d ax-shadow-deep rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
               {/* Chrome */}
               <div className="flex items-center justify-between border-b border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-4 py-3">
                 <div className="flex gap-1.5">
@@ -357,15 +349,15 @@ export default function LandingPage() {
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
               </div>
               {/* Mode tabs */}
-              <div className="ax-demo-tabs flex items-center border-b border-[var(--ax-border)] bg-[var(--ax-bg)] px-3 overflow-x-auto">
+              <div className="flex items-center border-b border-[var(--ax-border)] bg-[var(--ax-bg)] px-3">
                 {["Explain", "Quiz", "Flashcards", "Plan"].map((m, i) => (
-                  <button key={m} className={"ax-demo-tab ax-mono px-3 py-2.5 text-[0.66rem] font-medium transition-colors border-b-[1.5px] " + (i===0 ? "border-[var(--ax-text)] text-[var(--ax-text)]" : "border-transparent text-[var(--ax-text-tertiary)] hover:text-[var(--ax-text-secondary)]")}>
+                  <button key={m} className={"ax-mono px-3 py-2.5 text-[0.66rem] font-medium transition-colors border-b-[1.5px] " + (i===0 ? "border-[var(--ax-text)] text-[var(--ax-text)]" : "border-transparent text-[var(--ax-text-tertiary)] hover:text-[var(--ax-text-secondary)]")}>
                     {m}
                   </button>
                 ))}
               </div>
               {/* Body */}
-              <div className="ax-demo-body flex flex-col gap-4 p-5">
+              <div className="space-y-4 p-5">
                 {/* File chip */}
                 <div className="flex items-center gap-2 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-3 py-2">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[var(--ax-text-tertiary)]" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -394,7 +386,7 @@ export default function LandingPage() {
                 </div>
               </div>
               {/* Footer toolbar */}
-              <div className="ax-demo-toolbar flex items-center justify-between border-t border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-5 py-3">
+              <div className="flex items-center justify-between border-t border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-5 py-3">
                 <div className="flex items-center gap-1.5">
                   <span className="ax-mono text-[0.61rem] text-[var(--ax-text-tertiary)]">Depth:</span>
                   {["Simple","Intermediate","Advanced"].map((d,i) => (
@@ -415,10 +407,10 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       <div className="border-y border-[var(--ax-border)] bg-[var(--ax-surface)]">
         <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--ax-border)]">
+          <div className="grid grid-cols-3 divide-x divide-[var(--ax-border)]">
             {[{ val:"4", unit:"output modes" }, { val:"0", unit:"signups required" }, { val:"100%", unit:"local & private" }].map(s => (
-              <div key={s.unit} className="flex flex-col items-center justify-center gap-1 px-6 py-6 sm:py-7">
-                <span className="ax-fraunces text-[2.1rem] sm:text-[2.25rem] font-light leading-none tracking-[-0.03em]">{s.val}</span>
+              <div key={s.unit} className="flex flex-col items-center justify-center gap-1 px-6 py-7">
+                <span className="ax-fraunces text-[2.25rem] font-light leading-none tracking-[-0.03em]">{s.val}</span>
                 <span className="ax-mono mt-1 text-[0.66rem] uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.unit}</span>
               </div>
             ))}
@@ -429,7 +421,7 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* MARQUEE                                              */}
       {/* ════════════════════════════════════════════════════ */}
-      <div className="overflow-hidden border-b border-[var(--ax-border)] bg-[var(--ax-surface)] py-3" aria-hidden="true">
+      <div className="overflow-hidden border-b border-[var(--ax-border)] bg-[var(--ax-bg)] py-3" aria-hidden="true">
         <div className="ax-marquee">
           {[...Array(2)].map((_,p) => (
             <div key={p} className="flex items-center gap-10 pr-10">
@@ -447,7 +439,7 @@ export default function LandingPage() {
       {/* CAPABILITIES                                         */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="capabilities" className="bg-[var(--ax-bg)]">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
           <Reveal>
             <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
@@ -486,7 +478,7 @@ export default function LandingPage() {
             <div className="mx-auto max-w-3xl text-center">
               <div className="ax-rule mx-auto mb-10 w-16" />
               <blockquote className="ax-fraunces text-[2.1rem] font-light italic leading-[1.18] tracking-[-0.025em] md:text-[3rem]">
-                &ldquo;Not a chat interface.<br />A precision instrument.&rdquo;
+                &quot;Not a chat interface.<br />A precision instrument.&quot;
               </blockquote>
               <div className="ax-rule mx-auto mt-10 w-16" />
             </div>
@@ -498,7 +490,7 @@ export default function LandingPage() {
       {/* WORKFLOW                                             */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="workflow" className="bg-[var(--ax-bg)]">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
           <Reveal>
             <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
@@ -513,10 +505,10 @@ export default function LandingPage() {
             </div>
           </Reveal>
 
-          <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {STEPS.map((s, idx) => (
               <Reveal key={s.n} delayMs={idx * 80}>
-                <div className="ax-step-card ax-lift relative overflow-hidden rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 sm:px-7 pb-7 sm:pb-8 pt-12 sm:pt-14 shadow-[var(--ax-shadow-sm)]">
+                <div className="ax-step-card ax-lift relative overflow-hidden rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-7 pb-8 pt-14 shadow-[var(--ax-shadow-sm)]">
                   <span className="ax-step-num-bg" aria-hidden="true">{s.n}</span>
                   <div className="relative">
                     <p className="ax-mono text-[0.66rem] font-medium uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.n}</p>
@@ -579,9 +571,9 @@ export default function LandingPage() {
       <footer className="border-t border-[var(--ax-border)] bg-[var(--ax-bg)]">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-6 py-7 sm:flex-row">
           <Mark />
-          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+          <div className="flex items-center gap-4">
             <span className="ax-mono text-[0.65rem] uppercase tracking-[0.13em] text-[var(--ax-text-tertiary)]">v1.0 · Beta</span>
-            <span className="hidden sm:inline-block h-3 w-px bg-[var(--ax-border)]" aria-hidden="true" />
+            <span className="inline-block h-3 w-px bg-[var(--ax-border)]" aria-hidden="true" />
             <p className="ax-mono text-[0.65rem] text-[var(--ax-text-tertiary)]">© {new Date().getFullYear()} Axion. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-1.5">
