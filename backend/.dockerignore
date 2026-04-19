@@ -1,0 +1,61 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env.local
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files and coverage
+tests/
+test/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.test.py
+
+# Documentation
+docs/
+*.md
+*.rst
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Node (in case any frontend tooling is present)
+node_modules/
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
