@@ -2,14 +2,13 @@
 # Builds the frontend, then starts backend (port 8000) + frontend (port $PORT).
 
 [phases.setup]
-# Ensure Python includes pip (python310Full bundles ensurepip/pip)
-nixPkgs = ["nodejs_20", "python310Full"]
+# Use Nix-managed Python + pip (avoid ensurepip/PEP668 issues)
+nixPkgs = ["nodejs_20", "python310Full", "python310Packages.pip"]
 
 [phases.install]
 cmds = [
-  "python -m ensurepip --upgrade",
-  "python -m pip install --upgrade pip",
-  "python -m pip install -r backend/requirements.txt",
+  "pip --version",
+  "pip install --no-cache-dir -r backend/requirements.txt",
   "npm --prefix frontend ci"
 ]
 
