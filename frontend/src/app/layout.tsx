@@ -16,7 +16,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Axion | AI Workspace",
+  title: "Axios | AI Workspace",
   description: "Production-grade multi-agent AI workspace for complex documents",
 };
 

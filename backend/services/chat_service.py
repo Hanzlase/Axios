@@ -165,7 +165,7 @@ class ChatService:
         history: list[ChatMessage] | None = None,
     ) -> list[dict]:
         system_prompt = (
-            "You are Axion's retrieval assistant. "
+            "You are Axios's retrieval assistant. "
             "Answer precisely and use markdown with clear structure when helpful. "
             "Ground your answer in retrieved context; if context is missing, say so clearly. "
             "You have access to the prior conversation history for continuity."

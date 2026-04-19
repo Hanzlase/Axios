@@ -40,7 +40,7 @@ const STEPS = [
   {
     n: "03",
     title: "Export and continue",
-    desc: "Artifacts persist across refreshes. Pick up exactly where you left off without starting over.",
+    desc: "Artifacts persist across refreshs. Pick up exactly where you left off without starting over.",
   },
 ];
 
@@ -72,7 +72,7 @@ function Mark({ large = false }: { large?: boolean }) {
             : "ax-syne text-sm font-semibold tracking-tight"
         }
       >
-        Axion
+        Axios
       </span>
     </div>
   );
@@ -525,7 +525,7 @@ export default function LandingPage() {
             <Reveal delayMs={130}>
               {/* FIX 8: ax-hero-sub removes max-w on mobile via CSS */}
               <p className="ax-hero-sub ax-syne mt-6 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
-                Axion turns your files into explanations, quizzes, flashcards, and study plans. No noisy dashboards — just a clean workspace for thinking.
+                Axios turns your files into explanations, quizzes, flashcards, and study plans. No noisy dashboards — just a clean workspace for thinking.
               </p>
             </Reveal>
 
@@ -632,7 +632,7 @@ export default function LandingPage() {
       {/* STATS BAR                                           */}
       {/* ════════════════════════════════════════════════════ */}
       {/* FIX 2: ax-stats-grid for responsive single-col on mobile */}
-      <div className="border-y border-[var(--ax-border)] bg-[var(--ax-surface)]">
+      <div className="border-y border-[var(--ax-border)] bg-[var(--ax-surface]">
         <div className="mx-auto max-w-6xl">
           <div className="ax-stats-grid grid grid-cols-3 divide-x divide-[var(--ax-border)]">
             {[
@@ -683,7 +683,7 @@ export default function LandingPage() {
                 </h2>
               </div>
               <p className="hidden max-w-[22rem] text-[0.875rem] leading-[1.85] text-[var(--ax-text-secondary)] md:block">
-                Not a generic chat UI. Axion routes intent, retrieves evidence from your documents, and produces assets you can actually use.
+                Not a generic chat UI. Axios routes intent, retrieves evidence from your documents, and produces assets you can actually use.
               </p>
             </div>
           </Reveal>
@@ -815,11 +815,11 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <span className="ax-mono text-[0.65rem] uppercase tracking-[0.13em] text-[var(--ax-text-tertiary)]">v1.0 · Beta</span>
             <span className="inline-block h-3 w-px bg-[var(--ax-border)]" aria-hidden="true" />
-            <p className="ax-mono text-[0.65rem] text-[var(--ax-text-tertiary)]">© {new Date().getFullYear()} Axion. All rights reserved.</p>
+            <p className="ax-mono text-[0.65rem] text-[var(--ax-text-tertiary)]">© {new Date().getFullYear()} Axios. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
-            <span className="ax-mono text-[0.64rem] text-[var(--ax-text-tertiary)]">All systems operational</span>
+            <span className="ax-mono text-[0.64rem] text-[var(--ax-text-tertiary]">All systems operational</span>
           </div>
         </div>
       </footer>

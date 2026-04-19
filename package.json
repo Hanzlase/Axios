@@ -1,0 +1,14 @@
+{
+  "name": "axios-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "postinstall": "npm --prefix frontend install",
+    "build": "npm --prefix frontend run build",
+    "start": "(python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000) & (set PORT=%PORT% && node frontend/.next/standalone/server.js)",
+    "start:frontend": "node frontend/.next/standalone/server.js",
+    "start:backend": "python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000"
+  }
+}

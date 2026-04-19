@@ -155,28 +155,18 @@ After the frontend is deployed, copy its public URL and set:
 
 to the frontend URL (example: <code>https://YOUR-FRONTEND.up.railway.app</code>) in the backend service.
 
-### Option B: single service (frontend + backend in one container)
+### Option B: single service (no Docker)
 
-This repo also supports running **both** the FastAPI backend and the Next.js frontend inside **one Railway service**.
+If you really want <strong>one Railway service</strong> for both frontend + backend <em>without Docker</em>, the repo includes a Nixpacks configuration:
 
-**How it works**
-
-- The container starts the backend on `127.0.0.1:8000`.
-- The container starts the Next.js server on Railway’s public `$PORT`.
-- The frontend calls the backend using `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` (defaulted automatically by the container).
-
-**Railway setup**
-
-1. Create **one** Railway service from the repo.
-2. In the service settings, ensure it builds with the repo root `Dockerfile`.
-3. Set variables:
-   - `OPENROUTER_API_KEY` (optional if using Cohere fallback)
-   - `COHERE_API_KEY`
-   - `CORS_ALLOW_ORIGINS` (set to your Railway public URL, e.g. `https://<your-app>.up.railway.app`)
-   - `FRONTEND_ORIGIN` (same as above)
+- <code>nixpacks.toml</code> builds the frontend and installs backend dependencies.
+- At runtime, it starts:
+  - backend on <code>127.0.0.1:8000</code>
+  - frontend on Railway’s public <code>$PORT</code>
 
 Notes:
-- Single-service deployments are simpler, but you lose independent scaling and deploys.
+- This is convenient but not ideal for production (no independent scaling, shared CPU/RAM, and one process can affect the other).
+- Railway may still require additional settings depending on your plan and region.
 
 <hr />
 

@@ -650,7 +650,7 @@ export function WorkspaceShell() {
         <header className="mb-3 flex items-center justify-between rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-3 shadow-[var(--ax-shadow)]">
           <div>
             <p className="text-[0.7rem] uppercase tracking-[0.16em] text-[var(--ax-text-tertiary)]">
-              Axion
+              Axios
             </p>
             <h1 className="text-base font-semibold tracking-tight">
               AI Workspace Foundation
