@@ -27,13 +27,6 @@ class QuizAgent:
         num_questions: int = 5,
         **kwargs,
     ) -> AsyncIterator[str]:
-        from core.config import get_settings
-
-        if not get_settings().openrouter_api_key:
-            yield sse_payload({"type": "error", "message": "OpenRouter API key not configured."})
-            yield sse_payload({"type": "done"})
-            return
-
         total = int(num_questions)
         batch_size = int(kwargs.get("batch_size") or 8)
         batch_size = max(1, min(batch_size, 15))

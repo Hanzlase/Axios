@@ -12,60 +12,155 @@ from core.config import get_settings
 logger = structlog.get_logger()
 
 
+def _is_openrouter_rate_limit(exc: Exception) -> bool:
+    msg = str(exc)
+    return any(
+        needle in msg
+        for needle in [
+            "OpenRouter error 429",
+            "Rate limit",
+            "Too Many Requests",
+            "free-models-per-day",
+        ]
+    )
+
+
+async def _cohere_complete(
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.2,
+    max_tokens: int | None = None,
+) -> str:
+    settings = get_settings()
+    if not settings.cohere_api_key:
+        raise RuntimeError("Cohere API key is not configured")
+
+    payload: dict = {
+        "model": settings.cohere_model,
+        "stream": False,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": temperature,
+    }
+    # Cohere may reject unknown fields; only include when set.
+    if max_tokens is not None:
+        payload["max_tokens"] = max_tokens
+
+    headers = {
+        "Authorization": f"Bearer {settings.cohere_api_key}",
+        "Content-Type": "application/json",
+    }
+
+    endpoint = f"{settings.cohere_base_url}/chat"
+    timeout = httpx.Timeout(connect=20.0, read=60.0, write=20.0, pool=20.0)
+
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        response = await client.post(endpoint, headers=headers, json=payload)
+        if response.status_code >= 400:
+            detail = response.text
+            raise RuntimeError(f"Cohere error {response.status_code}: {detail[:1000]}")
+
+        parsed = response.json()
+        if not isinstance(parsed, dict):
+            raise RuntimeError("Cohere returned an unexpected response")
+
+        # Common: {"message": {"content": [{"type":"text","text":"..."}]}}
+        msg = parsed.get("message") or {}
+        content = msg.get("content")
+        if isinstance(content, list) and content:
+            first = content[0] or {}
+            if isinstance(first, dict) and isinstance(first.get("text"), str):
+                return str(first.get("text"))
+
+        # Fallbacks
+        if isinstance(parsed.get("text"), str):
+            return str(parsed.get("text"))
+        if isinstance(parsed.get("response"), str):
+            return str(parsed.get("response"))
+
+        raise RuntimeError("Could not extract text from Cohere response")
+
+
 async def stream_completion(
     system_prompt: str,
     user_prompt: str,
     temperature: float = 0.2,
     max_tokens: int | None = None,
 ) -> AsyncIterator[str]:
-    """Stream tokens from OpenRouter."""
+    """Stream tokens with provider fallback (OpenRouter -> Cohere).
+
+    This function always yields plain text tokens.
+    """
     settings = get_settings()
-    payload: dict = {
-        "model": settings.openrouter_model,
-        "stream": True,
-        "temperature": temperature,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-    }
-    if max_tokens:
-        payload["max_tokens"] = max_tokens
 
-    headers = {
-        "Authorization": f"Bearer {settings.openrouter_api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": settings.openrouter_site_url,
-        "X-Title": settings.openrouter_site_name,
-    }
+    # 1) Try OpenRouter streaming if configured
+    if settings.openrouter_api_key:
+        try:
+            payload: dict = {
+                "model": settings.openrouter_model,
+                "stream": True,
+                "temperature": temperature,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+            }
+            if max_tokens:
+                payload["max_tokens"] = max_tokens
 
-    timeout = httpx.Timeout(connect=20.0, read=None, write=20.0, pool=20.0)
-    endpoint = f"{settings.openrouter_base_url}/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {settings.openrouter_api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": settings.openrouter_site_url,
+                "X-Title": settings.openrouter_site_name,
+            }
 
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        async with client.stream("POST", endpoint, headers=headers, json=payload) as response:
-            if response.status_code >= 400:
-                body = await response.aread()
-                raise RuntimeError(
-                    f"OpenRouter error {response.status_code}: {body.decode('utf-8', errors='replace')[:500]}"
-                )
-            async for line in response.aiter_lines():
-                if not line or not line.startswith("data:"):
-                    continue
-                raw = line.removeprefix("data:").strip()
-                if raw == "[DONE]":
-                    break
-                try:
-                    parsed = json.loads(raw)
-                except json.JSONDecodeError:
-                    continue
-                choices = parsed.get("choices") or []
-                if not choices:
-                    continue
-                delta = choices[0].get("delta") or {}
-                token = delta.get("content")
-                if token:
-                    yield str(token)
+            timeout = httpx.Timeout(connect=20.0, read=None, write=20.0, pool=20.0)
+            endpoint = f"{settings.openrouter_base_url}/chat/completions"
+
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                async with client.stream(
+                    "POST", endpoint, headers=headers, json=payload
+                ) as response:
+                    if response.status_code >= 400:
+                        body = await response.aread()
+                        detail = body.decode("utf-8", errors="replace")
+                        raise RuntimeError(
+                            f"OpenRouter error {response.status_code}: {detail[:1000]}"
+                        )
+
+                    async for line in response.aiter_lines():
+                        if not line or not line.startswith("data:"):
+                            continue
+                        raw = line.removeprefix("data:").strip()
+                        if raw == "[DONE]":
+                            break
+                        try:
+                            parsed = json.loads(raw)
+                        except json.JSONDecodeError:
+                            continue
+                        choices = parsed.get("choices") or []
+                        if not choices:
+                            continue
+                        delta = choices[0].get("delta") or {}
+                        token = delta.get("content")
+                        if token:
+                            yield str(token)
+
+            return
+        except Exception as exc:
+            # Only fall back on rate-limit / transient upstream issues.
+            if _is_openrouter_rate_limit(exc):
+                logger.warning("openrouter_rate_limited_falling_back", error=str(exc))
+            else:
+                raise
+
+    # 2) Cohere fallback (non-stream -> yield as one chunk)
+    text = await _cohere_complete(system_prompt, user_prompt, temperature, max_tokens)
+    if text:
+        yield text
 
 
 async def complete(
@@ -74,7 +169,7 @@ async def complete(
     temperature: float = 0.1,
     max_tokens: int | None = None,
 ) -> str:
-    """Collect a full non-streaming completion."""
+    """Collect a full completion with provider fallback (OpenRouter -> Cohere)."""
     chunks: list[str] = []
     async for token in stream_completion(system_prompt, user_prompt, temperature, max_tokens):
         chunks.append(token)

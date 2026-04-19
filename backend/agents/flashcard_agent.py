@@ -25,12 +25,7 @@ class FlashcardAgent:
         num_cards: int = 10,
         **kwargs,
     ) -> AsyncIterator[str]:
-        from core.config import get_settings
-
-        if not get_settings().openrouter_api_key:
-            yield sse_payload({"type": "error", "message": "OpenRouter API key not configured."})
-            yield sse_payload({"type": "done"})
-            return
+        # Provider fallback is handled inside services.llm_service.complete()
 
         user_prompt = (
             f"Context:\n{context}\n\n"

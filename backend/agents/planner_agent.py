@@ -27,13 +27,6 @@ class PlannerAgent:
         num_days: int = 7,
         **kwargs,
     ) -> AsyncIterator[str]:
-        from core.config import get_settings
-
-        if not get_settings().openrouter_api_key:
-            yield sse_payload({"type": "error", "message": "OpenRouter API key not configured."})
-            yield sse_payload({"type": "done"})
-            return
-
         user_prompt = (
             f"Context:\n{context}\n\n"
             f"Request: {message}\n\n"

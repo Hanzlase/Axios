@@ -35,18 +35,6 @@ class ExplainerAgent:
         level: str = "intermediate",
         **kwargs,
     ) -> AsyncIterator[str]:
-        from core.config import get_settings
-
-        if not get_settings().openrouter_api_key:
-            fallback = (
-                "OpenRouter API key is not configured. "
-                "Set OPENROUTER_API_KEY to enable explanations."
-            )
-            for word in fallback.split():
-                yield sse_payload({"type": "token", "token": f"{word} "})
-            yield sse_payload({"type": "done"})
-            return
-
         guidance = _LEVEL_GUIDANCE.get(level, _LEVEL_GUIDANCE["intermediate"])
         system_prompt = (
             f"You are an expert teacher. {guidance} "
