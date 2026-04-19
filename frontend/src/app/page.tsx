@@ -201,7 +201,11 @@ export default function LandingPage() {
         }
         .ax-cap-row:hover .ax-row-arrow { transform:translate(2px,-2px); color:var(--ax-text); }
         @media (max-width:768px) {
-          .ax-cap-row { grid-template-columns:2rem 1fr 1.25rem; gap:1rem; }
+          .ax-cap-row {
+            grid-template-columns: 2rem 1fr 1.25rem;
+            gap: 0.75rem;
+            padding: 1.1rem 0.75rem;
+          }
           .ax-cap-desc { display:none; }
         }
 
@@ -226,7 +230,7 @@ export default function LandingPage() {
         .ax-cta-ghost {
           font-family: 'Fraunces', Georgia, serif;
           font-style: italic;
-          font-size: clamp(5rem, 13vw, 11rem);
+          font-size: clamp(4.5rem, 13vw, 11rem);
           font-weight: 700;
           line-height: .88;
           color: var(--ax-border);
@@ -241,50 +245,213 @@ export default function LandingPage() {
         /* ── Short rule ── */
         .ax-rule { height:1px; background:var(--ax-border); }
 
+        /* ══════════════════════════════════════════
+           FIX 1 — Hero title: fluid from 1.85rem → 4.75rem
+           ══════════════════════════════════════════ */
+        .ax-hero-title {
+          /* Fluid clamp: ~1.9rem on 320px, ~4.75rem on 1280px+ */
+          font-size: clamp(1.9rem, 6.5vw + 0.5rem, 4.75rem) !important;
+          line-height: 1.07 !important;
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 2 — Stats: single column on narrow (<480px)
+           ══════════════════════════════════════════ */
+        @media (max-width: 479px) {
+          .ax-stats-grid {
+            grid-template-columns: 1fr !important;
+            divide-x: none !important;
+          }
+          .ax-stats-grid > * {
+            border-left: none !important;
+            border-top: 1px solid var(--ax-border);
+          }
+          .ax-stats-grid > *:first-child {
+            border-top: none;
+          }
+          .ax-stats-cell {
+            flex-direction: row !important;
+            gap: 0.75rem !important;
+            justify-content: flex-start !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+            padding-left: 1.5rem !important;
+          }
+          .ax-stats-val {
+            font-size: 1.65rem !important;
+          }
+          .ax-stats-label {
+            margin-top: 0 !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 3 — Editorial quote: smaller on mobile
+           ══════════════════════════════════════════ */
+        .ax-editorial-quote {
+          font-size: clamp(1.55rem, 5vw + 0.25rem, 3rem);
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 4 — Section headings: fluid scale
+           ══════════════════════════════════════════ */
+        .ax-sec-title {
+          font-size: clamp(2rem, 5vw + 0.5rem, 3.25rem) !important;
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 5 — CTA heading: fluid
+           ══════════════════════════════════════════ */
+        .ax-cta-heading {
+          font-size: clamp(1.85rem, 5.5vw + 0.5rem, 3.75rem);
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 6 — Product card: constrain on mobile
+           ══════════════════════════════════════════ */
+        .ax-prod-card-wrap {
+          width: 100%;
+          max-width: 100%;
+        }
+        @media (max-width: 479px) {
+          .ax-prod-card {
+            /* Slightly tighten inner chrome on very small phones */
+            border-radius: 1rem !important;
+          }
+          .ax-prod-card .ax-prod-card-body {
+            padding: 0.875rem !important;
+          }
+          .ax-prod-tabs button {
+            padding-left: 0.55rem !important;
+            padding-right: 0.55rem !important;
+            font-size: 0.6rem !important;
+          }
+          .ax-prod-footer {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 7 — Hero hero CTA buttons: stack on xs
+           ══════════════════════════════════════════ */
+        @media (max-width: 400px) {
+          .ax-hero-btn-group {
+            flex-direction: column !important;
+          }
+          .ax-hero-btn-group a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 8 — Hero subtitle: full width on mobile
+           ══════════════════════════════════════════ */
+        @media (max-width: 640px) {
+          .ax-hero-sub {
+            max-width: 100% !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 9 — Navbar: tighter on small screens
+           ══════════════════════════════════════════ */
+        @media (max-width: 400px) {
+          .ax-nav-inner {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          .ax-nav-cta {
+            padding-left: 0.7rem !important;
+            padding-right: 0.7rem !important;
+            font-size: 0.72rem !important;
+          }
+          /* Hide the CTA arrow text on very small screens, keep icon */
+          .ax-nav-cta-label { display: none; }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 10 — Hero section padding
+           ══════════════════════════════════════════ */
+        @media (max-width: 479px) {
+          .ax-hero {
+            padding-top: 4.5rem !important;
+            padding-bottom: 3rem !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 11 — Section padding reduction on mobile
+           ══════════════════════════════════════════ */
+        @media (max-width: 479px) {
+          .ax-section-inner {
+            padding-top: 3.5rem !important;
+            padding-bottom: 3.5rem !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+          }
+          .ax-section-head-mb {
+            margin-bottom: 2.25rem !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 12 — Step cards on mobile
+           ══════════════════════════════════════════ */
+        @media (max-width: 479px) {
+          .ax-step-card {
+            padding-top: 3.25rem !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            padding-bottom: 1.75rem !important;
+          }
+          .ax-step-num-bg {
+            font-size: 6.5rem !important;
+            right: 0.75rem !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 13 — CTA section padding on mobile
+           ══════════════════════════════════════════ */
+        @media (max-width: 479px) {
+          .ax-cta-inner {
+            padding-top: 4rem !important;
+            padding-bottom: 4rem !important;
+          }
+          .ax-cta-ghost {
+            font-size: 4.5rem !important;
+          }
+          .ax-cta-btn-group {
+            flex-direction: column !important;
+          }
+          .ax-cta-btn-group a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+
+        /* ══════════════════════════════════════════
+           FIX 14 — Chips wrap cleanly on all sizes
+           ══════════════════════════════════════════ */
+        @media (max-width: 400px) {
+          .ax-hero-chips {
+            gap: 0.4rem !important;
+          }
+          .ax-hero-chip {
+            font-size: 0.6rem !important;
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+          }
+        }
+
         @media (prefers-reduced-motion:reduce) {
           .ax-grid,.ax-marquee,.ax-pulse { animation:none !important; }
           .ax-card-3d { transform:none !important; transition:none !important; }
-        }
-
-        /* ── Ultra-small phones (≈340px) ── */
-        @media (max-width: 360px) {
-          /* Global: reduce horizontal padding so content breathes */
-          .ax-xs-pad { padding-left: 1rem !important; padding-right: 1rem !important; }
-
-          /* Navbar: keep CTA compact */
-          .ax-nav { position: sticky; }
-          .ax-nav-cta { padding-left: .75rem !important; padding-right: .75rem !important; font-size: .75rem !important; }
-
-          /* Hero: tighter type + spacing */
-          .ax-hero { padding-top: 4.25rem !important; padding-bottom: 3.25rem !important; }
-          .ax-hero-title { font-size: 2.35rem !important; line-height: 1.08 !important; }
-          .ax-hero-sub { max-width: 100% !important; font-size: .9rem !important; }
-          .ax-hero-cta { width: 100% !important; justify-content: center !important; }
-          .ax-hero-cta { padding-left: 1rem !important; padding-right: 1rem !important; }
-
-          /* Chips: prevent awkward line breaks and keep them centered */
-          .ax-hero-chips { justify-content: center !important; }
-          .ax-hero-chip { padding-left: .7rem !important; padding-right: .7rem !important; }
-          .ax-hero-chip { font-size: .64rem !important; }
-
-          /* 3D product card: flatten + shrink chrome */
-          .ax-card-3d { transform: none !important; }
-          .ax-prod-card { border-radius: 1rem !important; }
-          .ax-prod-tabs button { padding-left: .6rem !important; padding-right: .6rem !important; }
-
-          /* Stats: less vertical padding, readable numbers */
-          .ax-stats-cell { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-          .ax-stats-val { font-size: 1.8rem !important; }
-
-          /* Section heads: avoid oversized headings */
-          .ax-sec-title { font-size: 2.1rem !important; }
-
-          /* Workflow cards: slightly tighter */
-          .ax-step-card { padding-left: 1.25rem !important; padding-right: 1.25rem !important; padding-top: 3.25rem !important; }
-          .ax-step-num-bg { font-size: 6.5rem !important; right: .75rem !important; }
-
-          /* CTA ghost text: stop overflow and reduce dominance */
-          .ax-cta-ghost { font-size: 5.25rem !important; }
         }
       `}</style>
 
@@ -298,8 +465,9 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* NAVBAR                                              */}
       {/* ════════════════════════════════════════════════════ */}
-      <nav className="ax-nav sticky top-0 z-40 border-b border-[var(--ax-border)] bg-[var(--ax-bg)]/80 backdrop-blur-xl">
-        <div className="ax-xs-pad mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav className="sticky top-0 z-40 border-b border-[var(--ax-border)] bg-[var(--ax-bg)]/80 backdrop-blur-xl">
+        {/* FIX 9: tighter padding class on xs via CSS */}
+        <div className="ax-nav-inner mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="ax-lift"><Mark /></div>
 
           <div className="hidden items-center gap-1 md:flex">
@@ -310,10 +478,11 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             <Link href="/workspace" className="ax-nav-cta ax-lift ax-syne inline-flex items-center gap-1.5 rounded-md bg-[var(--ax-text)] px-4 py-2 text-[0.8125rem] font-semibold text-[var(--ax-accent-fg)]">
-              Open workspace
+              {/* FIX 9: hide label text on very small screens, keep icon */}
+              <span className="ax-nav-cta-label">Open workspace</span>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
           </div>
@@ -323,7 +492,8 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* HERO                                                */}
       {/* ════════════════════════════════════════════════════ */}
-      <header className="ax-hero relative mx-auto max-w-6xl px-6 pt-24 pb-16 md:pt-32 md:pb-20">
+      {/* FIX 10: ax-hero class for responsive padding */}
+      <header className="ax-hero relative mx-auto max-w-6xl px-5 pt-20 pb-14 sm:px-6 md:pt-32 md:pb-20">
         {/* Faded star watermark */}
         <div aria-hidden="true" className="pointer-events-none absolute -right-8 top-8 select-none opacity-[0.035] dark:opacity-[0.06]">
           <svg width="440" height="440" viewBox="0 0 24 24" fill="var(--ax-text)" aria-hidden="true">
@@ -331,19 +501,20 @@ export default function LandingPage() {
           </svg>
         </div>
 
-        <div className="grid gap-14 md:grid-cols-[1fr_400px] md:items-start">
+        {/* FIX 6: right column gets ax-prod-card-wrap */}
+        <div className="grid gap-10 md:grid-cols-[1fr_400px] md:items-start md:gap-14">
 
           {/* LEFT */}
           <div>
             <Reveal delayMs={0}>
               <div className="inline-flex items-center gap-2.5 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3.5 py-1.5 shadow-[var(--ax-shadow-sm)]">
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
-                {/* removed per request */}
               </div>
             </Reveal>
 
             <Reveal delayMs={65}>
-              <h1 className="ax-hero-title ax-fraunces mt-7 text-[3.1rem] font-light leading-[1.06] tracking-[-0.03em] sm:text-[4rem] md:text-[4.75rem]">
+              {/* FIX 1: ax-hero-title now uses clamp() via CSS */}
+              <h1 className="ax-hero-title ax-fraunces mt-6 font-light leading-[1.06] tracking-[-0.03em]">
                 Understand<br />
                 <em className="font-normal" style={{ fontVariationSettings: "'opsz' 72" }}>complex documents</em><br />
                 with structured<br />
@@ -352,26 +523,29 @@ export default function LandingPage() {
             </Reveal>
 
             <Reveal delayMs={130}>
-              <p className="ax-hero-sub ax-syne mt-7 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
+              {/* FIX 8: ax-hero-sub removes max-w on mobile via CSS */}
+              <p className="ax-hero-sub ax-syne mt-6 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
                 Axion turns your files into explanations, quizzes, flashcards, and study plans. No noisy dashboards — just a clean workspace for thinking.
               </p>
             </Reveal>
 
             <Reveal delayMs={200}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/workspace" className="ax-hero-cta ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
+              {/* FIX 7: ax-hero-btn-group stacks on xs */}
+              <div className="ax-hero-btn-group mt-7 flex flex-wrap items-center gap-3">
+                <Link href="/workspace" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
                   Open workspace
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
-                <Link href="#workflow" className="ax-hero-cta ax-lift ax-syne inline-flex items-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
+                <Link href="#workflow" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
                   How it works
                 </Link>
               </div>
             </Reveal>
 
             <Reveal delayMs={265}>
-              <div className="ax-hero-chips mt-8 flex flex-wrap gap-2">
-                { [
+              {/* FIX 14: ax-hero-chips / ax-hero-chip classes for xs */}
+              <div className="ax-hero-chips mt-7 flex flex-wrap gap-2">
+                {[
                   "RAG over your docs",
                   "Multi-agent routing",
                   "Exportable outputs",
@@ -387,15 +561,17 @@ export default function LandingPage() {
             </Reveal>
           </div>
 
-          {/* RIGHT — 3-D product card */}
-          <Reveal delayMs={150} className="md:pt-2">
-            <div className="ax-prod-card ax-card-3d ax-shadow-deep rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
+          {/* RIGHT — 3-D product card
+              FIX 6: ax-prod-card-wrap ensures w-full on mobile */}
+          <Reveal delayMs={150} className="ax-prod-card-wrap md:pt-2">
+            <div className="ax-prod-card ax-card-3d ax-shadow-deep w-full rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
               {/* Chrome */}
               <div className="flex items-center justify-between border-b border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-4 py-3">
                 <div className="flex gap-1.5">
                   {[0,1,2].map(i => <div key={i} className="h-2.5 w-2.5 rounded-full bg-[var(--ax-border-strong)] opacity-40" />)}
                 </div>
-                <span className="ax-mono text-[0.62rem] uppercase tracking-widest text-[var(--ax-text-tertiary)]">workspace / explain</span>
+                {/* Hide long label on very small screens */}
+                <span className="ax-mono hidden text-[0.62rem] uppercase tracking-widest text-[var(--ax-text-tertiary)] xs:block sm:block">workspace / explain</span>
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
               </div>
               {/* Mode tabs */}
@@ -406,8 +582,8 @@ export default function LandingPage() {
                   </button>
                 ))}
               </div>
-              {/* Body */}
-              <div className="space-y-4 p-5">
+              {/* Body — FIX 6: ax-prod-card-body for xs padding override */}
+              <div className="ax-prod-card-body space-y-4 p-5">
                 {/* File chip */}
                 <div className="flex items-center gap-2 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-3 py-2">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[var(--ax-text-tertiary)]" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -435,8 +611,8 @@ export default function LandingPage() {
                   <div className="h-[7px] w-[58%] rounded-full bg-[var(--ax-border)] opacity-28" />
                 </div>
               </div>
-              {/* Footer toolbar */}
-              <div className="flex items-center justify-between border-t border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-5 py-3">
+              {/* Footer toolbar — FIX 6: ax-prod-footer for xs stacking */}
+              <div className="ax-prod-footer flex items-center justify-between border-t border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-5 py-3">
                 <div className="flex items-center gap-1.5">
                   <span className="ax-mono text-[0.61rem] text-[var(--ax-text-tertiary)]">Depth:</span>
                   {["Simple","Intermediate","Advanced"].map((d,i) => (
@@ -455,13 +631,18 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* STATS BAR                                           */}
       {/* ════════════════════════════════════════════════════ */}
+      {/* FIX 2: ax-stats-grid for responsive single-col on mobile */}
       <div className="border-y border-[var(--ax-border)] bg-[var(--ax-surface)]">
         <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-3 divide-x divide-[var(--ax-border)]">
-            {[{ val:"4", unit:"output modes" }, { val:"0", unit:"signups required" }, { val:"100%", unit:"local & private" }].map(s => (
-              <div key={s.unit} className="ax-stats-cell flex flex-col items-center justify-center gap-1 px-6 py-7">
+          <div className="ax-stats-grid grid grid-cols-3 divide-x divide-[var(--ax-border)]">
+            {[
+              { val:"4",    unit:"output modes" },
+              { val:"0",    unit:"signups required" },
+              { val:"100%", unit:"local & private" },
+            ].map(s => (
+              <div key={s.unit} className="ax-stats-cell flex flex-col items-center justify-center gap-1 px-4 py-6 sm:px-6 sm:py-7">
                 <span className="ax-stats-val ax-fraunces text-[2.25rem] font-light leading-none tracking-[-0.03em]">{s.val}</span>
-                <span className="ax-mono mt-1 text-[0.66rem] uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.unit}</span>
+                <span className="ax-stats-label ax-mono mt-1 text-[0.66rem] uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.unit}</span>
               </div>
             ))}
           </div>
@@ -489,12 +670,15 @@ export default function LandingPage() {
       {/* CAPABILITIES                                         */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="capabilities" className="bg-[var(--ax-bg)]">
-        <div className="ax-xs-pad mx-auto max-w-6xl px-6 py-24 md:py-32">
+        {/* FIX 11: ax-section-inner for responsive padding */}
+        <div className="ax-section-inner mx-auto max-w-6xl px-5 py-20 sm:px-6 md:py-32">
           <Reveal>
-            <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            {/* FIX 11: ax-section-head-mb for responsive margin */}
+            <div className="ax-section-head-mb mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.2em] text-[var(--ax-text-tertiary)]">02 — Capabilities</p>
-                <h2 className="ax-sec-title ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
+                {/* FIX 4: ax-sec-title uses clamp via CSS */}
+                <h2 className="ax-sec-title ax-fraunces mt-3 font-light leading-[1.08] tracking-[-0.025em]">
                   Designed around<br /><em>outputs.</em>
                 </h2>
               </div>
@@ -523,11 +707,12 @@ export default function LandingPage() {
       {/* EDITORIAL BREAK                                      */}
       {/* ════════════════════════════════════════════════════ */}
       <section className="border-y border-[var(--ax-border)] bg-[var(--ax-surface)]">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 md:py-28">
           <Reveal>
             <div className="mx-auto max-w-3xl text-center">
               <div className="ax-rule mx-auto mb-10 w-16" />
-              <blockquote className="ax-fraunces text-[2.1rem] font-light italic leading-[1.18] tracking-[-0.025em] md:text-[3rem]">
+              {/* FIX 3: ax-editorial-quote uses clamp via CSS */}
+              <blockquote className="ax-editorial-quote ax-fraunces font-light italic leading-[1.18] tracking-[-0.025em]">
                 &quot;Not a chat interface.<br />A precision instrument.&quot;
               </blockquote>
               <div className="ax-rule mx-auto mt-10 w-16" />
@@ -540,12 +725,13 @@ export default function LandingPage() {
       {/* WORKFLOW                                             */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="workflow" className="bg-[var(--ax-bg)]">
-        <div className="ax-xs-pad mx-auto max-w-6xl px-6 py-24 md:py-32">
+        <div className="ax-section-inner mx-auto max-w-6xl px-5 py-20 sm:px-6 md:py-32">
           <Reveal>
-            <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div className="ax-section-head-mb mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.2em] text-[var(--ax-text-tertiary)]">03 — Workflow</p>
-                <h2 className="ax-sec-title ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
+                {/* FIX 4 */}
+                <h2 className="ax-sec-title ax-fraunces mt-3 font-light leading-[1.08] tracking-[-0.025em]">
                   Upload. Ask.<br /><em>Export.</em>
                 </h2>
               </div>
@@ -555,10 +741,11 @@ export default function LandingPage() {
             </div>
           </Reveal>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
             {STEPS.map((s, idx) => (
               <Reveal key={s.n} delayMs={idx * 80}>
-                <div className="ax-step-card ax-lift relative overflow-hidden rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-7 pb-8 pt-14 shadow-[var(--ax-shadow-sm)]">
+                {/* FIX 12: ax-step-card for xs via CSS */}
+                <div className="ax-step-card ax-lift relative overflow-hidden rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 pb-7 pt-14 shadow-[var(--ax-shadow-sm)] sm:px-7 sm:pb-8">
                   <span className="ax-step-num-bg" aria-hidden="true">{s.n}</span>
                   <div className="relative">
                     <p className="ax-mono text-[0.66rem] font-medium uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.n}</p>
@@ -576,9 +763,11 @@ export default function LandingPage() {
       {/* CTA                                                  */}
       {/* ════════════════════════════════════════════════════ */}
       <section className="overflow-hidden border-t border-[var(--ax-border)] bg-[var(--ax-surface)]">
-        <div className="relative mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
+        {/* FIX 13: ax-cta-inner for xs padding via CSS */}
+        <div className="ax-cta-inner relative mx-auto max-w-6xl px-5 py-24 text-center sm:px-6 md:py-36">
           {/* Ghost text */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden select-none opacity-70">
+            {/* FIX 13: ax-cta-ghost uses clamp + xs override via CSS */}
             <span className="ax-cta-ghost">Axion</span>
           </div>
           <div className="relative">
@@ -586,7 +775,8 @@ export default function LandingPage() {
               <p className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.2em] text-[var(--ax-text-tertiary)]">04 — Get started</p>
             </Reveal>
             <Reveal delayMs={80}>
-              <h2 className="ax-fraunces mx-auto mt-5 max-w-2xl text-[2.5rem] font-light leading-[1.1] tracking-[-0.025em] md:text-[3.75rem]">
+              {/* FIX 5: ax-cta-heading uses clamp via CSS */}
+              <h2 className="ax-cta-heading ax-fraunces mx-auto mt-5 max-w-2xl font-light leading-[1.1] tracking-[-0.025em]">
                 A workspace built for<br /><em>serious thinking.</em>
               </h2>
             </Reveal>
@@ -596,7 +786,8 @@ export default function LandingPage() {
               </p>
             </Reveal>
             <Reveal delayMs={220}>
-              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              {/* FIX 13: ax-cta-btn-group stacks on xs */}
+              <div className="ax-cta-btn-group mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link href="/workspace" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-8 py-3.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
                   Open workspace
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -619,7 +810,7 @@ export default function LandingPage() {
       {/* FOOTER                                               */}
       {/* ════════════════════════════════════════════════════ */}
       <footer className="border-t border-[var(--ax-border)] bg-[var(--ax-bg)]">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-6 py-7 sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-6 sm:flex-row sm:px-6 sm:py-7">
           <Mark />
           <div className="flex items-center gap-4">
             <span className="ax-mono text-[0.65rem] uppercase tracking-[0.13em] text-[var(--ax-text-tertiary)]">v1.0 · Beta</span>
