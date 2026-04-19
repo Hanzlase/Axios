@@ -3,22 +3,29 @@
 
 [phases.setup]
 # Use Nix-managed Python + pip (avoid ensurepip/PEP668 issues)
-nixPkgs = ["nodejs_20", "python310Full", "python310Packages.pip"]
+#nixPkgs = ["nodejs_20", "python310Full", "python310Packages.pip"]
++nixPkgs = ["nodejs_20", "python310Full", "python310Packages.pip", "python310Packages.virtualenv"]
 
 [phases.install]
-cmds = [
-  "pip --version",
-  "pip install --no-cache-dir -r backend/requirements.txt",
-  "npm --prefix frontend ci"
-]
+ cmds = [
+-  "pip --version",
+-  "pip install --no-cache-dir -r backend/requirements.txt",
++  "python --version",
++  "python -m venv .venv",
++  ". .venv/bin/activate && python -m pip --version",
++  ". .venv/bin/activate && python -m pip install --no-cache-dir --upgrade pip setuptools wheel",
++  ". .venv/bin/activate && python -m pip install --no-cache-dir -r backend/requirements.txt",
+   "npm --prefix frontend ci"
+ ]
 
 [phases.build]
-cmds = [
-  "npm --prefix frontend run build"
-]
+ cmds = [
+   "npm --prefix frontend run build"
+ ]
 
 [start]
-cmd = "python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000 & node frontend/.next/standalone/server.js"
+-cmd = "python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000 & node frontend/.next/standalone/server.js"
++cmd = ". .venv/bin/activate && python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000 & node frontend/.next/standalone/server.js"
 
 [env]
-NEXT_PUBLIC_API_BASE_URL = "http://127.0.0.1:8000"
+ NEXT_PUBLIC_API_BASE_URL = "http://127.0.0.1:8000"
