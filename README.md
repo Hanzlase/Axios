@@ -1,37 +1,50 @@
-# Axion
+# <img alt="Axion" width="30" height="30" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkles.svg" /> AXION
 
-<p align="left">
-  <span style="display:inline-flex;align-items:center;gap:8px;">
-    <img alt="Axion" width="22" height="22" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkles.svg" />
-    <strong>AI Workspace</strong>
-  </span>
+<p align="center"><strong>Transform Documents Into Structured Outputs</strong></p>
+
+<p align="center">
+  <a href="#quickstart">Quickstart</a>
+  &nbsp;•&nbsp;
+  <a href="#features">Features</a>
+  &nbsp;•&nbsp;
+  <a href="#architecture">Architecture</a>
+  &nbsp;•&nbsp;
+  <a href="#configuration">Configuration</a>
+  &nbsp;•&nbsp;
+  <a href="#api">API</a>
 </p>
 
-<p>
-  <strong>Axion</strong> is a local-first RAG workspace (Retrieval-Augmented Generation): upload documents, build session-scoped context, and generate structured outputs (chat, explain, quiz, flashcards, plan) with citations.
+<p align="center">
+  <a href="#live-demo"><img alt="Live Demo" src="https://img.shields.io/badge/LIVE%20DEMO-Coming%20Soon-111827?style=for-the-badge" /></a>
+  <a href="/workspace"><img alt="Open Workspace" src="https://img.shields.io/badge/WORKSPACE-/workspace-0ea5e9?style=for-the-badge" /></a>
+  <a href="#"><img alt="Status" src="https://img.shields.io/badge/STATUS-Active-16a34a?style=for-the-badge" /></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/LICENSE-Project-6b7280?style=for-the-badge" /></a>
+</p>
+
+<p align="center">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square" />
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-SSE-05998b?style=flat-square" />
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square" />
 </p>
 
 <hr />
 
-## <img alt="Overview" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/layout-grid.svg" /> Overview
+## <img alt="What" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/target.svg" /> What is Axion?
+
+Axion is a local-first RAG workspace (Retrieval-Augmented Generation): upload documents, retrieve evidence from your session, and generate structured outputs such as **explanations**, **quizzes**, **flashcards**, and **study plans**.
+
+<hr />
+
+## <img alt="Features" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkle.svg" /> Features
 
 <ul>
-  <li><strong>Frontend:</strong> Next.js (App Router) + TypeScript</li>
-  <li><strong>Backend:</strong> FastAPI + SSE streaming</li>
-  <li><strong>RAG:</strong> SentenceTransformers embeddings + FAISS + BM25 + reranking</li>
-  <li><strong>LLM:</strong> Provider fallback (stream-first, with a non-stream guarantee path)</li>
+  <li><strong>Grounded answers:</strong> hybrid retrieval (vector + BM25) with reranking.</li>
+  <li><strong>Structured modes:</strong> chat, explain, quiz, flashcards, plan (auto-routed).</li>
+  <li><strong>Citations:</strong> sources returned alongside generation.</li>
+  <li><strong>Streaming UX:</strong> SSE token streaming to the UI.</li>
+  <li><strong>Local-first:</strong> session-scoped document context.</li>
 </ul>
-
-<hr />
-
-## <img alt="Repository" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/folder-tree.svg" /> Repository layout
-
-```text
-Axion/
-  backend/                  FastAPI services and agents
-  frontend/                 Next.js UI
-  README.md
-```
 
 <hr />
 
@@ -44,7 +57,7 @@ Axion/
   <li><strong>Python</strong> 3.10+</li>
 </ul>
 
-### 1) Backend (FastAPI)
+### Backend (FastAPI)
 
 ```powershell
 cd "backend"
@@ -52,13 +65,12 @@ python -m pip install -r requirements.txt
 python main.py
 ```
 
-Backend default:
 <ul>
-  <li><code>http://localhost:8000</code></li>
+  <li>API: <code>http://localhost:8000</code></li>
   <li>Docs: <code>http://localhost:8000/docs</code></li>
 </ul>
 
-### 2) Frontend (Next.js)
+### Frontend (Next.js)
 
 ```powershell
 cd "frontend"
@@ -66,9 +78,8 @@ npm install
 npm run dev
 ```
 
-Frontend default:
 <ul>
-  <li><code>http://localhost:3000</code></li>
+  <li>Web: <code>http://localhost:3000</code></li>
 </ul>
 
 <hr />
@@ -82,7 +93,7 @@ cd "frontend"
 npm run build
 ```
 
-### Backend (sanity compile)
+### Backend (compile check)
 
 ```powershell
 cd "backend"
@@ -91,9 +102,22 @@ python -m py_compile main.py
 
 <hr />
 
+## <img alt="Architecture" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/workflow.svg" /> Architecture
+
+```text
+Browser (Next.js)
+  └─ SSE stream consumer
+      └─ FastAPI backend
+          ├─ /upload (ingestion)
+          ├─ RAG retrieve (FAISS + BM25 + rerank)
+          └─ /api/*/stream (generation)
+```
+
+<hr />
+
 ## <img alt="Configuration" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/settings.svg" /> Configuration
 
-Create a <code>backend/.env</code> file if you want to override defaults.
+Create <code>backend/.env</code> to override defaults.
 
 <table>
   <thead>
@@ -105,11 +129,11 @@ Create a <code>backend/.env</code> file if you want to override defaults.
   <tbody>
     <tr>
       <td><code>OPENROUTER_API_KEY</code></td>
-      <td>Primary LLM provider key (OpenAI-compatible).</td>
+      <td>Primary LLM key (OpenAI-compatible).</td>
     </tr>
     <tr>
       <td><code>COHERE_API_KEY</code></td>
-      <td>Fallback provider key (used when primary is unavailable / limited).</td>
+      <td>Fallback LLM key (used when the primary provider is limited/unavailable).</td>
     </tr>
     <tr>
       <td><code>ALLOW_ORIGINS</code></td>
@@ -124,26 +148,18 @@ Create a <code>backend/.env</code> file if you want to override defaults.
 
 <hr />
 
-## <img alt="API" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/network.svg" /> API notes
+## <img alt="API" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/network.svg" /> API
 
 <ul>
-  <li><code>POST /upload</code> uploads files into a session.</li>
-  <li><code>POST /api/chat/stream</code> streams grounded answers with SSE frames (<code>status</code>, <code>sources</code>, <code>token</code>, <code>done</code>).</li>
-  <li><code>POST /api/agent/stream</code> streams agent-mode outputs (<code>auto</code>, <code>chat</code>, <code>explain</code>, <code>quiz</code>, <code>flashcards</code>, <code>plan</code>).</li>
-</ul>
-
-<hr />
-
-## <img alt="Troubleshooting" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/life-buoy.svg" /> Troubleshooting
-
-<ul>
-  <li><strong>No answers:</strong> verify at least one provider key is set (<code>OPENROUTER_API_KEY</code> or <code>COHERE_API_KEY</code>).</li>
-  <li><strong>CORS issues:</strong> ensure <code>ALLOW_ORIGINS</code> includes your frontend origin.</li>
-  <li><strong>Cold start:</strong> first retrieval can take longer due to model loading (embeddings / reranker).</li>
+  <li><code>POST /upload</code>: upload session documents.</li>
+  <li><code>GET /api/uploads/{session_id}</code>: list session files + status.</li>
+  <li><code>POST /api/chat/stream</code>: SSE stream for chat.</li>
+  <li><code>POST /api/agent/stream</code>: SSE stream for agent modes.</li>
+  <li><code>GET /health</code>: liveness check.</li>
 </ul>
 
 <hr />
 
 ## <img alt="License" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/scale.svg" /> License
 
-See repository license (if provided).
+See <code>LICENSE</code> (if provided).
