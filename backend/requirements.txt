@@ -1,3 +1,10 @@
+# PyTorch CPU-only build — must be declared before sentence-transformers so pip
+# resolves the CPU wheel instead of the default GPU/CUDA build. The extra index
+# URL points to PyTorch's own wheel repository; PyPI remains the primary index
+# for every other package.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.6.0+cpu
+
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 gunicorn==22.0.0
