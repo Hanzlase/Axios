@@ -106,67 +106,47 @@ python -m py_compile main.py
 
 ## <img alt="Deploy" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/cloud.svg" /> Deploy (Railway)
 
-This repo is set up to deploy as <strong>two Railway services</strong> in one Railway project:
+Deploy this repo as **two Railway services** in one Railway project:
 
-<ul>
-  <li><strong>backend</strong> (FastAPI) — root directory: <code>backend</code></li>
-  <li><strong>frontend</strong> (Next.js) — root directory: <code>frontend</code></li>
-</ul>
+- **backend** (FastAPI) — Root Directory: `backend`
+- **frontend** (Next.js) — Root Directory: `frontend`
 
-### Option A (recommended): two services
+### 1) Deploy backend service
 
-#### 1) Deploy backend service
+1. Railway → **New Project** → **Deploy from GitHub repo**
+2. Create a service and set **Root Directory** to `backend`
+3. Railway will start the API via `backend/Procfile` and bind to `$PORT`
 
-<ul>
-  <li>Create a Railway project → <strong>New Service</strong> → <strong>GitHub Repo</strong></li>
-  <li>Set the service <strong>Root Directory</strong> to <code>backend</code></li>
-  <li>Railway will start via <code>backend/Procfile</code> and bind to <code>$PORT</code></li>
-</ul>
+Backend variables (Railway → Service → Variables):
+- `APP_ENV=production`
+- `LOG_LEVEL=INFO`
+- `OPENROUTER_API_KEY` (optional)
+- `COHERE_API_KEY` (optional)
+- `CORS_ALLOW_ORIGINS` (set after deploying frontend; use your frontend public URL)
+- `FRONTEND_ORIGIN` (set after deploying frontend; use your frontend public URL)
 
-Backend variables (Railway → Variables):
-<ul>
-  <li><code>APP_ENV=production</code></li>
-  <li><code>LOG_LEVEL=INFO</code></li>
-  <li><code>OPENROUTER_API_KEY</code> (optional)</li>
-  <li><code>COHERE_API_KEY</code> (optional)</li>
-  <li><code>CORS_ALLOW_ORIGINS</code> (set after frontend deploy)</li>
-</ul>
+After deploy, confirm:
+- `https://<backend-service>.up.railway.app/health`
+- `https://<backend-service>.up.railway.app/docs`
 
-#### 2) Deploy frontend service
+### 2) Deploy frontend service
 
-<ul>
-  <li>Create a second Railway service from the same repo</li>
-  <li>Set the service <strong>Root Directory</strong> to <code>frontend</code></li>
-  <li>The frontend uses a Docker build (see <code>frontend/Dockerfile</code>)</li>
-</ul>
+1. In the same Railway project → **New Service** → GitHub repo
+2. Set **Root Directory** to `frontend`
+3. The frontend builds with `frontend/Dockerfile`
 
 Frontend variables:
-<ul>
-  <li><code>NEXT_PUBLIC_API_BASE_URL</code> = your backend public URL (example: <code>https://YOUR-BACKEND.up.railway.app</code>)</li>
-</ul>
+- `NEXT_PUBLIC_API_BASE_URL=https://<backend-service>.up.railway.app`
 
-#### 3) Final CORS wiring
+### 3) Final CORS wiring
 
-After the frontend is deployed, copy its public URL and set:
-<ul>
-  <li><code>FRONTEND_ORIGIN</code></li>
-  <li><code>CORS_ALLOW_ORIGINS</code></li>
-</ul>
+After the frontend deploys, copy its public URL `https://<frontend-service>.up.railway.app` and set in the **backend** service:
+- `CORS_ALLOW_ORIGINS=https://<frontend-service>.up.railway.app`
+- `FRONTEND_ORIGIN=https://<frontend-service>.up.railway.app`
 
-to the frontend URL (example: <code>https://YOUR-FRONTEND.up.railway.app</code>) in the backend service.
+Redeploy the backend service (or trigger a new deploy) after updating variables.
 
-### Option B: single service (no Docker)
-
-If you really want <strong>one Railway service</strong> for both frontend + backend <em>without Docker</em>, the repo includes a Nixpacks configuration:
-
-- <code>nixpacks.toml</code> builds the frontend and installs backend dependencies.
-- At runtime, it starts:
-  - backend on <code>127.0.0.1:8000</code>
-  - frontend on Railway’s public <code>$PORT</code>
-
-Notes:
-- This is convenient but not ideal for production (no independent scaling, shared CPU/RAM, and one process can affect the other).
-- Railway may still require additional settings depending on your plan and region.
+> Note: The previous single-service (Nixpacks) deployment path is intentionally removed; two services are more reliable and production-friendly on Railway.
 
 <hr />
 
