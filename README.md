@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="#live-demo"><img alt="Live Demo" src="https://img.shields.io/badge/LIVE%20DEMO-Coming%20Soon-111827?style=for-the-badge" /></a>
+  <a href="https://axios0.up.railway.app/"><img alt="Live Demo" src="https://img.shields.io/badge/LIVE%20DEMO-axios0.up.railway.app-111827?style=for-the-badge" /></a>
   <a href="/workspace"><img alt="Open Workspace" src="https://img.shields.io/badge/WORKSPACE-/workspace-0ea5e9?style=for-the-badge" /></a>
   <a href="#"><img alt="Status" src="https://img.shields.io/badge/STATUS-Active-16a34a?style=for-the-badge" /></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/LICENSE-Project-6b7280?style=for-the-badge" /></a>
@@ -29,6 +29,8 @@
   <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-SSE-05998b?style=flat-square" />
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square" />
 </p>
+
+> Live URL: https://axios0.up.railway.app/
 
 <hr />
 
@@ -110,6 +112,11 @@ Deploy this repo as **two Railway services** in one Railway project:
 
 - **backend** (FastAPI) — Root Directory: `backend`
 - **frontend** (Next.js) — Root Directory: `frontend`
+
+### Live deployment
+
+- Frontend: https://axios0.up.railway.app/
+- Backend: https://<backend-service>.up.railway.app/
 
 ### 1) Deploy backend service
 
