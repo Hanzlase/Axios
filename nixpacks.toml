@@ -20,7 +20,9 @@ cmds = [
   "rm -rf frontend/node_modules",
 
   # 2. Remove Next.js build cache (not needed at runtime)
-  "rm -rf frontend/.next/cache",
+  # NOTE: .next/cache may be a BuildKit/Nixpacks cache mount during build; 'rm' can fail with 'Device or resource busy'.
+  # Best-effort cleanup only.
+  "rm -rf frontend/.next/cache 2>/dev/null || true",
 
   # 3. Strip Python bytecode and caches from venv
   "find /app/.venv -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true",
@@ -34,4 +36,5 @@ cmds = [
 cmd = "/app/.venv/bin/python -m uvicorn backend.core.main:app --host 0.0.0.0 --port 8000 & sleep 3 && node frontend/.next/standalone/server.js"
 
 [env]
-NEXT_PUBLIC_API_BASE_URL = ""
+# Frontend talks to the backend over localhost inside the same Railway service.
+NEXT_PUBLIC_API_BASE_URL = "http://127.0.0.1:8000"
