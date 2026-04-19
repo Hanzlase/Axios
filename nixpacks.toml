@@ -2,11 +2,12 @@
 # Builds the frontend, then starts backend (port 8000) + frontend (port $PORT).
 
 [phases.setup]
-# Keep minimal; nixpacks will bring node/python
-nixPkgs = ["nodejs_20", "python310"]
+# Ensure Python includes pip (python310Full bundles ensurepip/pip)
+nixPkgs = ["nodejs_20", "python310Full"]
 
 [phases.install]
 cmds = [
+  "python -m ensurepip --upgrade",
   "python -m pip install --upgrade pip",
   "python -m pip install -r backend/requirements.txt",
   "npm --prefix frontend ci"
