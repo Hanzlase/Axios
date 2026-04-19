@@ -12,6 +12,8 @@
   <a href="#configuration">Configuration</a>
   &nbsp;•&nbsp;
   <a href="#api">API</a>
+  &nbsp;•&nbsp;
+  <a href="#deploy-railway">Deploy (Railway)</a>
 </p>
 
 <p align="center">
@@ -99,6 +101,82 @@ npm run build
 cd "backend"
 python -m py_compile main.py
 ```
+
+<hr />
+
+## <img alt="Deploy" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/cloud.svg" /> Deploy (Railway)
+
+This repo is set up to deploy as <strong>two Railway services</strong> in one Railway project:
+
+<ul>
+  <li><strong>backend</strong> (FastAPI) — root directory: <code>backend</code></li>
+  <li><strong>frontend</strong> (Next.js) — root directory: <code>frontend</code></li>
+</ul>
+
+### Option A (recommended): two services
+
+#### 1) Deploy backend service
+
+<ul>
+  <li>Create a Railway project → <strong>New Service</strong> → <strong>GitHub Repo</strong></li>
+  <li>Set the service <strong>Root Directory</strong> to <code>backend</code></li>
+  <li>Railway will start via <code>backend/Procfile</code> and bind to <code>$PORT</code></li>
+</ul>
+
+Backend variables (Railway → Variables):
+<ul>
+  <li><code>APP_ENV=production</code></li>
+  <li><code>LOG_LEVEL=INFO</code></li>
+  <li><code>OPENROUTER_API_KEY</code> (optional)</li>
+  <li><code>COHERE_API_KEY</code> (optional)</li>
+  <li><code>CORS_ALLOW_ORIGINS</code> (set after frontend deploy)</li>
+</ul>
+
+#### 2) Deploy frontend service
+
+<ul>
+  <li>Create a second Railway service from the same repo</li>
+  <li>Set the service <strong>Root Directory</strong> to <code>frontend</code></li>
+  <li>The frontend uses a Docker build (see <code>frontend/Dockerfile</code>)</li>
+</ul>
+
+Frontend variables:
+<ul>
+  <li><code>NEXT_PUBLIC_API_BASE_URL</code> = your backend public URL (example: <code>https://YOUR-BACKEND.up.railway.app</code>)</li>
+</ul>
+
+#### 3) Final CORS wiring
+
+After the frontend is deployed, copy its public URL and set:
+<ul>
+  <li><code>FRONTEND_ORIGIN</code></li>
+  <li><code>CORS_ALLOW_ORIGINS</code></li>
+</ul>
+
+to the frontend URL (example: <code>https://YOUR-FRONTEND.up.railway.app</code>) in the backend service.
+
+### Option B: single service (frontend + backend in one container)
+
+This repo also supports running **both** the FastAPI backend and the Next.js frontend inside **one Railway service**.
+
+**How it works**
+
+- The container starts the backend on `127.0.0.1:8000`.
+- The container starts the Next.js server on Railway’s public `$PORT`.
+- The frontend calls the backend using `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000` (defaulted automatically by the container).
+
+**Railway setup**
+
+1. Create **one** Railway service from the repo.
+2. In the service settings, ensure it builds with the repo root `Dockerfile`.
+3. Set variables:
+   - `OPENROUTER_API_KEY` (optional if using Cohere fallback)
+   - `COHERE_API_KEY`
+   - `CORS_ALLOW_ORIGINS` (set to your Railway public URL, e.g. `https://<your-app>.up.railway.app`)
+   - `FRONTEND_ORIGIN` (same as above)
+
+Notes:
+- Single-service deployments are simpler, but you lose independent scaling and deploys.
 
 <hr />
 
