@@ -245,6 +245,47 @@ export default function LandingPage() {
           .ax-grid,.ax-marquee,.ax-pulse { animation:none !important; }
           .ax-card-3d { transform:none !important; transition:none !important; }
         }
+
+        /* ── Ultra-small phones (≈340px) ── */
+        @media (max-width: 360px) {
+          /* Global: reduce horizontal padding so content breathes */
+          .ax-xs-pad { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+          /* Navbar: keep CTA compact */
+          .ax-nav { position: sticky; }
+          .ax-nav-cta { padding-left: .75rem !important; padding-right: .75rem !important; font-size: .75rem !important; }
+
+          /* Hero: tighter type + spacing */
+          .ax-hero { padding-top: 4.25rem !important; padding-bottom: 3.25rem !important; }
+          .ax-hero-title { font-size: 2.35rem !important; line-height: 1.08 !important; }
+          .ax-hero-sub { max-width: 100% !important; font-size: .9rem !important; }
+          .ax-hero-cta { width: 100% !important; justify-content: center !important; }
+          .ax-hero-cta { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+          /* Chips: prevent awkward line breaks and keep them centered */
+          .ax-hero-chips { justify-content: center !important; }
+          .ax-hero-chip { padding-left: .7rem !important; padding-right: .7rem !important; }
+          .ax-hero-chip { font-size: .64rem !important; }
+
+          /* 3D product card: flatten + shrink chrome */
+          .ax-card-3d { transform: none !important; }
+          .ax-prod-card { border-radius: 1rem !important; }
+          .ax-prod-tabs button { padding-left: .6rem !important; padding-right: .6rem !important; }
+
+          /* Stats: less vertical padding, readable numbers */
+          .ax-stats-cell { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+          .ax-stats-val { font-size: 1.8rem !important; }
+
+          /* Section heads: avoid oversized headings */
+          .ax-sec-title { font-size: 2.1rem !important; }
+
+          /* Workflow cards: slightly tighter */
+          .ax-step-card { padding-left: 1.25rem !important; padding-right: 1.25rem !important; padding-top: 3.25rem !important; }
+          .ax-step-num-bg { font-size: 6.5rem !important; right: .75rem !important; }
+
+          /* CTA ghost text: stop overflow and reduce dominance */
+          .ax-cta-ghost { font-size: 5.25rem !important; }
+        }
       `}</style>
 
       {/* Ambient grid */}
@@ -257,8 +298,8 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* NAVBAR                                              */}
       {/* ════════════════════════════════════════════════════ */}
-      <nav className="sticky top-0 z-40 border-b border-[var(--ax-border)] bg-[var(--ax-bg)]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav className="ax-nav sticky top-0 z-40 border-b border-[var(--ax-border)] bg-[var(--ax-bg)]/80 backdrop-blur-xl">
+        <div className="ax-xs-pad mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="ax-lift"><Mark /></div>
 
           <div className="hidden items-center gap-1 md:flex">
@@ -271,7 +312,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Link href="/workspace" className="ax-lift ax-syne inline-flex items-center gap-1.5 rounded-md bg-[var(--ax-text)] px-4 py-2 text-[0.8125rem] font-semibold text-[var(--ax-accent-fg)]">
+            <Link href="/workspace" className="ax-nav-cta ax-lift ax-syne inline-flex items-center gap-1.5 rounded-md bg-[var(--ax-text)] px-4 py-2 text-[0.8125rem] font-semibold text-[var(--ax-accent-fg)]">
               Open workspace
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
@@ -282,7 +323,7 @@ export default function LandingPage() {
       {/* ════════════════════════════════════════════════════ */}
       {/* HERO                                                */}
       {/* ════════════════════════════════════════════════════ */}
-      <header className="relative mx-auto max-w-6xl px-6 pt-24 pb-16 md:pt-32 md:pb-20">
+      <header className="ax-hero relative mx-auto max-w-6xl px-6 pt-24 pb-16 md:pt-32 md:pb-20">
         {/* Faded star watermark */}
         <div aria-hidden="true" className="pointer-events-none absolute -right-8 top-8 select-none opacity-[0.035] dark:opacity-[0.06]">
           <svg width="440" height="440" viewBox="0 0 24 24" fill="var(--ax-text)" aria-hidden="true">
@@ -297,12 +338,12 @@ export default function LandingPage() {
             <Reveal delayMs={0}>
               <div className="inline-flex items-center gap-2.5 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3.5 py-1.5 shadow-[var(--ax-shadow-sm)]">
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
-                <span className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">Local-first · Session-scoped · Production ready</span>
+                {/* removed per request */}
               </div>
             </Reveal>
 
             <Reveal delayMs={65}>
-              <h1 className="ax-fraunces mt-7 text-[3.1rem] font-light leading-[1.06] tracking-[-0.03em] sm:text-[4rem] md:text-[4.75rem]">
+              <h1 className="ax-hero-title ax-fraunces mt-7 text-[3.1rem] font-light leading-[1.06] tracking-[-0.03em] sm:text-[4rem] md:text-[4.75rem]">
                 Understand<br />
                 <em className="font-normal" style={{ fontVariationSettings: "'opsz' 72" }}>complex documents</em><br />
                 with structured<br />
@@ -311,27 +352,36 @@ export default function LandingPage() {
             </Reveal>
 
             <Reveal delayMs={130}>
-              <p className="ax-syne mt-7 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
+              <p className="ax-hero-sub ax-syne mt-7 max-w-[21rem] text-[0.9125rem] leading-[1.85] text-[var(--ax-text-secondary)]">
                 Axion turns your files into explanations, quizzes, flashcards, and study plans. No noisy dashboards — just a clean workspace for thinking.
               </p>
             </Reveal>
 
             <Reveal delayMs={200}>
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/workspace" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
+                <Link href="/workspace" className="ax-hero-cta ax-lift ax-syne inline-flex items-center gap-2 rounded-md bg-[var(--ax-text)] px-6 py-2.5 text-[0.875rem] font-semibold text-[var(--ax-accent-fg)] shadow-[var(--ax-shadow-sm)]">
                   Open workspace
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
-                <Link href="#workflow" className="ax-lift ax-syne inline-flex items-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
+                <Link href="#workflow" className="ax-hero-cta ax-lift ax-syne inline-flex items-center gap-2 rounded-md border border-[var(--ax-border)] bg-[var(--ax-surface)] px-6 py-2.5 text-[0.875rem] font-medium text-[var(--ax-text)] hover:border-[var(--ax-border-strong)]">
                   How it works
                 </Link>
               </div>
             </Reveal>
 
             <Reveal delayMs={265}>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {["RAG over your docs", "Multi-agent routing", "Exportable outputs"].map((t) => (
-                  <span key={t} className="ax-mono rounded-full border border-[var(--ax-border)] px-3 py-1 text-[0.67rem] text-[var(--ax-text-tertiary)]">{t}</span>
+              <div className="ax-hero-chips mt-8 flex flex-wrap gap-2">
+                { [
+                  "RAG over your docs",
+                  "Multi-agent routing",
+                  "Exportable outputs",
+                ].map((t) => (
+                  <span
+                    key={t}
+                    className="ax-hero-chip ax-mono rounded-full border border-[var(--ax-border)] px-3 py-1 text-[0.67rem] text-[var(--ax-text-tertiary)]"
+                  >
+                    {t}
+                  </span>
                 ))}
               </div>
             </Reveal>
@@ -339,7 +389,7 @@ export default function LandingPage() {
 
           {/* RIGHT — 3-D product card */}
           <Reveal delayMs={150} className="md:pt-2">
-            <div className="ax-card-3d ax-shadow-deep rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
+            <div className="ax-prod-card ax-card-3d ax-shadow-deep rounded-2xl border border-[var(--ax-border)] bg-[var(--ax-surface)] overflow-hidden">
               {/* Chrome */}
               <div className="flex items-center justify-between border-b border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-4 py-3">
                 <div className="flex gap-1.5">
@@ -349,8 +399,8 @@ export default function LandingPage() {
                 <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
               </div>
               {/* Mode tabs */}
-              <div className="flex items-center border-b border-[var(--ax-border)] bg-[var(--ax-bg)] px-3">
-                {["Explain", "Quiz", "Flashcards", "Plan"].map((m, i) => (
+              <div className="ax-prod-tabs flex items-center border-b border-[var(--ax-border)] bg-[var(--ax-bg)] px-3">
+                {"Explain Quiz Flashcards Plan".split(" ").map((m, i) => (
                   <button key={m} className={"ax-mono px-3 py-2.5 text-[0.66rem] font-medium transition-colors border-b-[1.5px] " + (i===0 ? "border-[var(--ax-text)] text-[var(--ax-text)]" : "border-transparent text-[var(--ax-text-tertiary)] hover:text-[var(--ax-text-secondary)]")}>
                     {m}
                   </button>
@@ -409,8 +459,8 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-3 divide-x divide-[var(--ax-border)]">
             {[{ val:"4", unit:"output modes" }, { val:"0", unit:"signups required" }, { val:"100%", unit:"local & private" }].map(s => (
-              <div key={s.unit} className="flex flex-col items-center justify-center gap-1 px-6 py-7">
-                <span className="ax-fraunces text-[2.25rem] font-light leading-none tracking-[-0.03em]">{s.val}</span>
+              <div key={s.unit} className="ax-stats-cell flex flex-col items-center justify-center gap-1 px-6 py-7">
+                <span className="ax-stats-val ax-fraunces text-[2.25rem] font-light leading-none tracking-[-0.03em]">{s.val}</span>
                 <span className="ax-mono mt-1 text-[0.66rem] uppercase tracking-[0.15em] text-[var(--ax-text-tertiary)]">{s.unit}</span>
               </div>
             ))}
@@ -439,12 +489,12 @@ export default function LandingPage() {
       {/* CAPABILITIES                                         */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="capabilities" className="bg-[var(--ax-bg)]">
-        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+        <div className="ax-xs-pad mx-auto max-w-6xl px-6 py-24 md:py-32">
           <Reveal>
             <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.2em] text-[var(--ax-text-tertiary)]">02 — Capabilities</p>
-                <h2 className="ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
+                <h2 className="ax-sec-title ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
                   Designed around<br /><em>outputs.</em>
                 </h2>
               </div>
@@ -490,12 +540,12 @@ export default function LandingPage() {
       {/* WORKFLOW                                             */}
       {/* ════════════════════════════════════════════════════ */}
       <section id="workflow" className="bg-[var(--ax-bg)]">
-        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+        <div className="ax-xs-pad mx-auto max-w-6xl px-6 py-24 md:py-32">
           <Reveal>
             <div className="mb-14 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="ax-mono text-[0.67rem] font-medium uppercase tracking-[0.2em] text-[var(--ax-text-tertiary)]">03 — Workflow</p>
-                <h2 className="ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
+                <h2 className="ax-sec-title ax-fraunces mt-3 text-[2.5rem] font-light leading-[1.08] tracking-[-0.025em] md:text-[3.25rem]">
                   Upload. Ask.<br /><em>Export.</em>
                 </h2>
               </div>
