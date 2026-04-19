@@ -32,18 +32,13 @@ COPY backend ./
 
 
 ###########
-# Runtime
+# Backend runtime (python only)
 ###########
-FROM python:3.10-slim AS runtime
+FROM python:3.10-slim AS backend-runtime
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
-
-# OS deps needed by node runtime + curl for healthchecks
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends nodejs npm curl \
-  && rm -rf /var/lib/apt/lists/*
 
 # Backend deps
 COPY backend/requirements.txt /app/backend/requirements.txt
@@ -52,8 +47,19 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 # Backend code
 COPY --from=backend-builder /app/backend /app/backend
 
+
+###########
+# Final runtime (node only) + embedded backend runtime
+# This keeps the final image smaller than installing node into a python base.
+###########
+FROM node:20-bookworm-slim AS runtime
+WORKDIR /app
+
+# Copy python runtime + site-packages from backend-runtime
+COPY --from=backend-runtime /usr/local /usr/local
+COPY --from=backend-runtime /app/backend /app/backend
+
 # Frontend standalone output
-# Next.js standalone output is produced under .next/standalone and includes its own server.js + node_modules subset
 COPY --from=frontend-builder /app/frontend/public /app/frontend/public
 COPY --from=frontend-builder /app/frontend/.next/standalone /app/frontend/.next/standalone
 COPY --from=frontend-builder /app/frontend/.next/static /app/frontend/.next/static
@@ -62,7 +68,5 @@ COPY --from=frontend-builder /app/frontend/.next/static /app/frontend/.next/stat
 COPY railway-start.sh /app/railway-start.sh
 RUN chmod +x /app/railway-start.sh
 
-# Railway provides $PORT for the public service port. We'll bind Next.js to $PORT.
 EXPOSE 8080
-
 CMD ["/app/railway-start.sh"]
