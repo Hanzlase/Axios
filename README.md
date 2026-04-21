@@ -108,7 +108,7 @@ Upload any document. Axios retrieves the right evidence using **hybrid search**,
 ### 1 — Clone
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Hanzlase/Axios.git
 cd axios
 ```
 
