@@ -1,220 +1,261 @@
-# <img alt="Axion" width="30" height="30" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkles.svg" /> AXION
+<div align="center">
 
-<p align="center"><strong>Transform Documents Into Structured Outputs</strong></p>
+<br/>
 
-<p align="center">
-  <a href="#quickstart">Quickstart</a>
-  &nbsp;•&nbsp;
-  <a href="#features">Features</a>
-  &nbsp;•&nbsp;
-  <a href="#architecture">Architecture</a>
-  &nbsp;•&nbsp;
-  <a href="#configuration">Configuration</a>
-  &nbsp;•&nbsp;
-  <a href="#api">API</a>
-  &nbsp;•&nbsp;
-  <a href="#deploy-railway">Deploy (Railway)</a>
-</p>
+```
+ █████╗ ██╗  ██╗██╗ ██████╗ ███████╗
+██╔══██╗╚██╗██╔╝██║██╔═══██╗██╔════╝
+███████║ ╚███╔╝ ██║██║   ██║███████╗
+██╔══██║ ██╔██╗ ██║██║   ██║╚════██║
+██║  ██║██╔╝ ██╗██║╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝ ╚═════╝ ╚══════╝
+```
 
-<p align="center">
-  <a href="https://axios0.up.railway.app/"><img alt="Live Demo" src="https://img.shields.io/badge/LIVE%20DEMO-axios0.up.railway.app-111827?style=for-the-badge" /></a>
-  <a href="/workspace"><img alt="Open Workspace" src="https://img.shields.io/badge/WORKSPACE-/workspace-0ea5e9?style=for-the-badge" /></a>
-  <a href="#"><img alt="Status" src="https://img.shields.io/badge/STATUS-Active-16a34a?style=for-the-badge" /></a>
-  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/LICENSE-Project-6b7280?style=for-the-badge" /></a>
-</p>
+### **Transform Documents Into Structured Intelligence**
 
-<p align="center">
-  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square" />
-  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-SSE-05998b?style=flat-square" />
-  <img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square" />
-</p>
+*Upload. Retrieve. Generate.*
 
-> Live URL: https://axios0.up.railway.app/
+<br/>
 
-<hr />
+[![Live Demo](https://img.shields.io/badge/🌐%20LIVE%20DEMO-axios0.up.railway.app-0f172a?style=for-the-badge&logo=railway&logoColor=white)](https://axios0.up.railway.app/)
+[![Status](https://img.shields.io/badge/STATUS-ACTIVE-16a34a?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/LICENSE-Project-6b7280?style=for-the-badge)](./LICENSE)
 
-## <img alt="What" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/target.svg" /> What is Axion?
+<br/>
 
-Axion is a local-first RAG workspace (Retrieval-Augmented Generation): upload documents, retrieve evidence from your session, and generate structured outputs such as **explanations**, **quizzes**, **flashcards**, and **study plans**.
+![Next.js](https://img.shields.io/badge/Next.js_15-App_Router-000000?style=flat-square&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript_5.x-3178c6?style=flat-square&logo=typescript&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-SSE_Streaming-05998b?style=flat-square&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.10+-3776ab?style=flat-square&logo=python&logoColor=white)
 
-<hr />
+<br/>
 
-## <img alt="Features" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkle.svg" /> Features
+---
 
-<ul>
-  <li><strong>Grounded answers:</strong> hybrid retrieval (vector + BM25) with reranking.</li>
-  <li><strong>Structured modes:</strong> chat, explain, quiz, flashcards, plan (auto-routed).</li>
-  <li><strong>Citations:</strong> sources returned alongside generation.</li>
-  <li><strong>Streaming UX:</strong> SSE token streaming to the UI.</li>
-  <li><strong>Local-first:</strong> session-scoped document context.</li>
-</ul>
+</div>
 
-<hr />
+## ⚡ What is Axios?
 
-## <img alt="Quickstart" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/rocket.svg" /> Quickstart
+**Axios** is a local-first RAG (Retrieval-Augmented Generation) workspace that turns your raw documents into structured, actionable knowledge — instantly.
+
+Upload any document. Axios retrieves the right evidence using **hybrid search**, then generates precisely what you need: detailed explanations, interactive quizzes, spaced-repetition flashcards, or complete study plans — all grounded in *your* content, not hallucinations.
+
+<br/>
+
+---
+
+## 🚀 Features
+
+| | Feature | Description |
+|---|---|---|
+| 🔍 | **Hybrid Retrieval** | Vector search + BM25 keyword matching + neural reranking for maximum recall precision |
+| 🧠 | **Structured Modes** | Auto-routed generation: `chat`, `explain`, `quiz`, `flashcards`, `plan` |
+| 📎 | **Grounded Citations** | Every response ships with source references — no black-box answers |
+| ⚡ | **Streaming UX** | Real-time SSE token streaming — output appears as it's generated |
+| 🔒 | **Local-First** | Session-scoped document context — your documents never leave your session |
+| 🌐 | **Production-Ready** | Railway-deployable, Docker-supported, CORS-configured two-service architecture |
+
+<br/>
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     AXIOS PIPELINE                          │
+└─────────────────────────────────────────────────────────────┘
+
+  📄 Document Upload
+       │
+       ▼
+  ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+  │  Ingestion  │────▶│  FAISS Index │     │  BM25 Index  │
+  │  + Chunking │     │  (Vectors)   │     │  (Keywords)  │
+  └─────────────┘     └──────┬───────┘     └──────┬───────┘
+                             │                    │
+                             └─────────┬──────────┘
+                                       │ Hybrid Retrieve
+                                       ▼
+                              ┌─────────────────┐
+                              │  Neural Rerank  │  (Cohere)
+                              └────────┬────────┘
+                                       │
+                                       ▼
+                         ┌─────────────────────────┐
+                         │   LLM Generation        │
+                         │  (OpenRouter / Cohere)  │
+                         └────────────┬────────────┘
+                                      │ SSE Stream
+                                      ▼
+                            ┌─────────────────┐
+                            │  Next.js UI     │
+                            │  (React + SSE)  │
+                            └─────────────────┘
+```
+
+<br/>
+
+---
+
+## ⚙️ Quickstart
 
 ### Prerequisites
 
-<ul>
-  <li><strong>Node.js</strong> 18+</li>
-  <li><strong>Python</strong> 3.10+</li>
-</ul>
+- **Node.js** 18+
+- **Python** 3.10+
 
-### Backend (FastAPI)
+### 1 — Clone
 
-```powershell
-cd "backend"
-python -m pip install -r requirements.txt
+```bash
+git clone <your-repo-url>
+cd axios
+```
+
+### 2 — Backend (FastAPI)
+
+```bash
+cd backend
+pip install -r requirements.txt
 python main.py
 ```
 
-<ul>
-  <li>API: <code>http://localhost:8000</code></li>
-  <li>Docs: <code>http://localhost:8000/docs</code></li>
-</ul>
+> API live at → `http://localhost:8000`  
+> Swagger docs → `http://localhost:8000/docs`
 
-### Frontend (Next.js)
+### 3 — Frontend (Next.js)
 
-```powershell
-cd "frontend"
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-<ul>
-  <li>Web: <code>http://localhost:3000</code></li>
-</ul>
+> App live at → `http://localhost:3000`
 
-<hr />
+### 4 — Environment
 
-## <img alt="Build" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/hammer.svg" /> Build
+Create `backend/.env`:
 
-### Frontend
-
-```powershell
-cd "frontend"
-npm run build
+```env
+OPENROUTER_API_KEY=your_key_here
+COHERE_API_KEY=your_key_here
+ALLOW_ORIGINS=http://localhost:3000
+LOG_LEVEL=INFO
 ```
 
-### Backend (compile check)
+<br/>
 
-```powershell
-cd "backend"
-python -m py_compile main.py
+---
+
+## 🌍 Deploy on Railway
+
+Axios deploys as **two independent Railway services** — backend and frontend — in one Railway project.
+
+```
+Railway Project
+├── backend-service   (FastAPI)   ← Root: /backend
+└── frontend-service  (Next.js)   ← Root: /frontend
 ```
 
-<hr />
+### Step 1 — Deploy Backend
 
-## <img alt="Deploy" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/cloud.svg" /> Deploy (Railway)
+1. Railway → **New Project** → **Deploy from GitHub**
+2. Set Root Directory: `backend`
+3. Railway starts the API via `backend/Procfile` on `$PORT`
 
-Deploy this repo as **two Railway services** in one Railway project:
+**Backend environment variables:**
 
-- **backend** (FastAPI) — Root Directory: `backend`
-- **frontend** (Next.js) — Root Directory: `frontend`
-
-### Live deployment
-
-- Frontend: https://axios0.up.railway.app/
-- Backend: https://<backend-service>.up.railway.app/
-
-### 1) Deploy backend service
-
-1. Railway → **New Project** → **Deploy from GitHub repo**
-2. Create a service and set **Root Directory** to `backend`
-3. Railway will start the API via `backend/Procfile` and bind to `$PORT`
-
-Backend variables (Railway → Service → Variables):
-- `APP_ENV=production`
-- `LOG_LEVEL=INFO`
-- `OPENROUTER_API_KEY` (optional)
-- `COHERE_API_KEY` (optional)
-- `CORS_ALLOW_ORIGINS` (set after deploying frontend; use your frontend public URL)
-- `FRONTEND_ORIGIN` (set after deploying frontend; use your frontend public URL)
-
-After deploy, confirm:
-- `https://<backend-service>.up.railway.app/health`
-- `https://<backend-service>.up.railway.app/docs`
-
-### 2) Deploy frontend service
-
-1. In the same Railway project → **New Service** → GitHub repo
-2. Set **Root Directory** to `frontend`
-3. The frontend builds with `frontend/Dockerfile`
-
-Frontend variables:
-- `NEXT_PUBLIC_API_BASE_URL=https://<backend-service>.up.railway.app`
-
-### 3) Final CORS wiring
-
-After the frontend deploys, copy its public URL `https://<frontend-service>.up.railway.app` and set in the **backend** service:
-- `CORS_ALLOW_ORIGINS=https://<frontend-service>.up.railway.app`
-- `FRONTEND_ORIGIN=https://<frontend-service>.up.railway.app`
-
-Redeploy the backend service (or trigger a new deploy) after updating variables.
-
-> Note: The previous single-service (Nixpacks) deployment path is intentionally removed; two services are more reliable and production-friendly on Railway.
-
-<hr />
-
-## <img alt="Architecture" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/workflow.svg" /> Architecture
-
-```text
-Browser (Next.js)
-  └─ SSE stream consumer
-      └─ FastAPI backend
-          ├─ /upload (ingestion)
-          ├─ RAG retrieve (FAISS + BM25 + rerank)
-          └─ /api/*/stream (generation)
+```env
+APP_ENV=production
+LOG_LEVEL=INFO
+OPENROUTER_API_KEY=<your_key>
+COHERE_API_KEY=<your_key>
+CORS_ALLOW_ORIGINS=<frontend_url>       # Set after frontend deploy
+FRONTEND_ORIGIN=<frontend_url>          # Set after frontend deploy
 ```
 
-<hr />
+Verify deployment:
+- `https://<backend>.up.railway.app/health`
+- `https://<backend>.up.railway.app/docs`
 
-## <img alt="Configuration" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/settings.svg" /> Configuration
+### Step 2 — Deploy Frontend
 
-Create <code>backend/.env</code> to override defaults.
+1. In the same project → **New Service** → GitHub repo
+2. Set Root Directory: `frontend`
+3. Builds via `frontend/Dockerfile`
 
-<table>
-  <thead>
-    <tr>
-      <th align="left">Variable</th>
-      <th align="left">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>OPENROUTER_API_KEY</code></td>
-      <td>Primary LLM key (OpenAI-compatible).</td>
-    </tr>
-    <tr>
-      <td><code>COHERE_API_KEY</code></td>
-      <td>Fallback LLM key (used when the primary provider is limited/unavailable).</td>
-    </tr>
-    <tr>
-      <td><code>ALLOW_ORIGINS</code></td>
-      <td>CORS allow-list (comma-separated). Include <code>http://localhost:3000</code> for local dev.</td>
-    </tr>
-    <tr>
-      <td><code>LOG_LEVEL</code></td>
-      <td>Backend log level (example: <code>INFO</code>).</td>
-    </tr>
-  </tbody>
-</table>
+**Frontend environment variables:**
 
-<hr />
+```env
+NEXT_PUBLIC_API_BASE_URL=https://<backend>.up.railway.app
+```
 
-## <img alt="API" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/network.svg" /> API
+### Step 3 — Wire CORS
 
-<ul>
-  <li><code>POST /upload</code>: upload session documents.</li>
-  <li><code>GET /api/uploads/{session_id}</code>: list session files + status.</li>
-  <li><code>POST /api/chat/stream</code>: SSE stream for chat.</li>
-  <li><code>POST /api/agent/stream</code>: SSE stream for agent modes.</li>
-  <li><code>GET /health</code>: liveness check.</li>
-</ul>
+After frontend deploys, copy its public URL and update the **backend** service:
 
-<hr />
+```env
+CORS_ALLOW_ORIGINS=https://<frontend>.up.railway.app
+FRONTEND_ORIGIN=https://<frontend>.up.railway.app
+```
 
-## <img alt="License" width="18" height="18" src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/scale.svg" /> License
+Trigger a backend redeploy. You're live. 🎉
 
-See <code>LICENSE</code> (if provided).
+<br/>
+
+---
+
+## 📡 API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/upload` | Upload session documents for ingestion |
+| `GET` | `/api/uploads/{session_id}` | List session files and processing status |
+| `POST` | `/api/chat/stream` | SSE stream — conversational chat mode |
+| `POST` | `/api/agent/stream` | SSE stream — structured agent modes (quiz, explain, flashcards, plan) |
+| `GET` | `/health` | Liveness probe |
+
+<br/>
+
+---
+
+## 🔧 Configuration Reference
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENROUTER_API_KEY` | Optional | Primary LLM provider (OpenAI-compatible) |
+| `COHERE_API_KEY` | Optional | Fallback LLM + reranking provider |
+| `ALLOW_ORIGINS` | Yes (prod) | CORS allowlist (comma-separated URLs) |
+| `FRONTEND_ORIGIN` | Yes (prod) | Trusted frontend origin |
+| `APP_ENV` | Optional | `development` or `production` |
+| `LOG_LEVEL` | Optional | Log verbosity — `DEBUG`, `INFO`, `WARNING` |
+
+<br/>
+
+---
+
+## 🛠️ Build
+
+```bash
+# Frontend production build
+cd frontend && npm run build
+
+# Backend syntax check
+cd backend && python -m py_compile main.py
+```
+
+<br/>
+
+---
+
+<div align="center">
+
+**Axios** — Built with FastAPI, Next.js, FAISS, and BM25.  
+Deployed on [Railway](https://railway.app) · Live at [axios0.up.railway.app](https://axios0.up.railway.app/)
+
+<br/>
+
+*Built by [Hanzla](https://github.com/Hanzlase)*
+
+</div>
