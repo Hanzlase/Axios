@@ -163,7 +163,7 @@ export function WorkspaceShell() {
   const [connection, setConnection] = useState<ConnectionState>("checking");
 
   // Keep setters for now (used by backend polling), discard state values to avoid unused lint.
-  const [, setBackendMeta] = useState<StatusResponse | null>(null);
+  const [backendMeta, setBackendMeta] = useState<StatusResponse | null>(null);
   const [, setHealthLatency] = useState<number | null>(null);
   const [, setLastHealthTs] = useState<string | null>(null);
   const [, setIsBackendLoading] = useState(true);
@@ -1330,6 +1330,16 @@ export function WorkspaceShell() {
             </div>
           </aside>
         </main>
+        <footer className="mt-3 flex items-center justify-between px-2 text-[10px] text-[var(--ax-text-tertiary)] shrink-0">
+          <div>
+            <span>Axios Workspace v0.1.1</span>
+          </div>
+          {connection === "connected" && backendMeta && (
+            <div>
+              <span>API: {backendMeta.name} (v{backendMeta.version}) • {backendMeta.env}</span>
+            </div>
+          )}
+        </footer>
       </div>
 
       {toasts.length > 0 && (

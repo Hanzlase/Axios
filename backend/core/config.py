@@ -13,7 +13,7 @@ load_dotenv()
 class Settings(BaseModel):
     app_name: str = "Axion AI Workspace API"
     env: str = "development"  # development|staging|production
-    api_version: str = "1.0.0"
+    api_version: str = "1.0.1"
     log_level: str = "INFO"
     request_timeout_seconds: int = 30
 
