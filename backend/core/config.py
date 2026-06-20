@@ -32,7 +32,7 @@ class Settings(BaseModel):
 
     # OpenRouter
     openrouter_api_key: str = ""
-    openrouter_model: str = "nvidia/nemotron-3-super-120b-a12b:free"
+    openrouter_model: str = "google/gemma-2-9b-it:free"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_site_url: str = "http://localhost:3000"
     openrouter_site_name: str = "Axion Workspace"
