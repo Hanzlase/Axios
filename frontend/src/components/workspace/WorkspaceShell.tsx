@@ -1,5 +1,6 @@
 "use client";
 
+// Deployment trigger update for Railway
 import {
   type ChangeEvent,
   type DragEvent,
