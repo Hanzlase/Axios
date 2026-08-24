@@ -92,6 +92,10 @@ def create_app() -> FastAPI:
             env=settings.env,
             version=settings.api_version,
         )
+        import asyncio
+        from services.rag_service import get_rag_service
+        asyncio.create_task(asyncio.to_thread(get_rag_service()._load_embedding_model))
+        asyncio.create_task(asyncio.to_thread(get_rag_service()._load_reranker_model))
 
     return app
 

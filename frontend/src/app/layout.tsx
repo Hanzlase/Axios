@@ -43,9 +43,7 @@ export default function RootLayout({
       className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <template id="axion-theme" dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       <body className="min-h-full flex flex-col bg-[var(--ax-bg)]">
         <ThemeProvider>
           {children}
