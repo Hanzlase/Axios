@@ -115,12 +115,10 @@ class ChatService:
                 raise RuntimeError(f"Unknown LLM provider in fallback order: {provider}")
             except Exception as exc:
                 last_error = exc
-                # Only fall through on rate limits / transient upstream errors.
-                if provider == "openrouter" and self._is_openrouter_rate_limit(exc):
+                if provider == "openrouter":
                     fell_back_from_openrouter = True
-                    logger.warning("openrouter_rate_limited_falling_back", error=str(exc))
+                    logger.warning("openrouter_failed_falling_back", error=str(exc))
                     continue
-                # For other errors, don't silently switch providers.
                 raise
 
         if last_error:

@@ -80,71 +80,76 @@ async def _agent_stream(req: AgentStreamRequest):
         return
 
     # 3. Route to agent
-    if mode == "quiz":
-        agent = get_quiz_agent()
-        store = get_session_store()
-        async for chunk in agent.run(
-            req.session_id, message, context, num_questions=req.num_questions
-        ):
-            # Intercept result to save in session store
-            if chunk and '"mode": "quiz"' in chunk:
-                import json as _json
-                try:
-                    frame = _json.loads(chunk.removeprefix("data:").strip())
-                    if frame.get("type") == "result":
-                        store.save_agent_result(req.session_id, "quiz", frame["data"])
-                except Exception:
-                    pass
-            yield chunk
+    try:
+        if mode == "quiz":
+            agent = get_quiz_agent()
+            store = get_session_store()
+            async for chunk in agent.run(
+                req.session_id, message, context, num_questions=req.num_questions
+            ):
+                # Intercept result to save in session store
+                if chunk and '"mode": "quiz"' in chunk:
+                    import json as _json
+                    try:
+                        frame = _json.loads(chunk.removeprefix("data:").strip())
+                        if frame.get("type") == "result":
+                            store.save_agent_result(req.session_id, "quiz", frame["data"])
+                    except Exception:
+                        pass
+                yield chunk
 
-    elif mode == "flashcards":
-        agent = get_flashcard_agent()
-        store = get_session_store()
-        async for chunk in agent.run(
-            req.session_id, message, context, num_cards=req.num_cards
-        ):
-            if chunk and '"mode": "flashcards"' in chunk:
-                import json as _json
-                try:
-                    frame = _json.loads(chunk.removeprefix("data:").strip())
-                    if frame.get("type") == "result":
-                        store.save_agent_result(req.session_id, "flashcards", frame["data"])
-                except Exception:
-                    pass
-            yield chunk
+        elif mode == "flashcards":
+            agent = get_flashcard_agent()
+            store = get_session_store()
+            async for chunk in agent.run(
+                req.session_id, message, context, num_cards=req.num_cards
+            ):
+                if chunk and '"mode": "flashcards"' in chunk:
+                    import json as _json
+                    try:
+                        frame = _json.loads(chunk.removeprefix("data:").strip())
+                        if frame.get("type") == "result":
+                            store.save_agent_result(req.session_id, "flashcards", frame["data"])
+                    except Exception:
+                        pass
+                yield chunk
 
-    elif mode == "plan":
-        agent = get_planner_agent()
-        store = get_session_store()
-        async for chunk in agent.run(
-            req.session_id, message, context, num_days=req.num_days
-        ):
-            if chunk and '"mode": "plan"' in chunk:
-                import json as _json
-                try:
-                    frame = _json.loads(chunk.removeprefix("data:").strip())
-                    if frame.get("type") == "result":
-                        store.save_agent_result(req.session_id, "plan", frame["data"])
-                except Exception:
-                    pass
-            yield chunk
+        elif mode == "plan":
+            agent = get_planner_agent()
+            store = get_session_store()
+            async for chunk in agent.run(
+                req.session_id, message, context, num_days=req.num_days
+            ):
+                if chunk and '"mode": "plan"' in chunk:
+                    import json as _json
+                    try:
+                        frame = _json.loads(chunk.removeprefix("data:").strip())
+                        if frame.get("type") == "result":
+                            store.save_agent_result(req.session_id, "plan", frame["data"])
+                    except Exception:
+                        pass
+                yield chunk
 
-    elif mode == "explain":
-        agent = get_explainer_agent()
-        async for chunk in agent.run(
-            req.session_id, message, context, level=req.level
-        ):
-            yield chunk
+        elif mode == "explain":
+            agent = get_explainer_agent()
+            async for chunk in agent.run(
+                req.session_id, message, context, level=req.level
+            ):
+                yield chunk
 
-    else:
-        # chat / summarize → use existing chat service streaming
-        chat = get_chat_service()
-        async for chunk in chat.stream_chat(
-            session_id=req.session_id,
-            user_message=message,
-            top_k=req.top_k,
-        ):
-            yield chunk
+        else:
+            # chat / summarize → use existing chat service streaming
+            chat = get_chat_service()
+            async for chunk in chat.stream_chat(
+                session_id=req.session_id,
+                user_message=message,
+                top_k=req.top_k,
+            ):
+                yield chunk
+    except Exception as exc:
+        logger.exception("agent_dispatch_failed", session_id=req.session_id, error=str(exc))
+        yield sse_payload({"type": "error", "message": f"Agent request failed: {exc}"})
+        yield sse_payload({"type": "done"})
 
 
 @router.post("/api/agent/stream")

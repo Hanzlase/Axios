@@ -8,6 +8,11 @@ from pydantic import BaseModel
 from pydantic import field_validator
 
 
+from pathlib import Path
+
+_backend_env = Path(__file__).resolve().parent.parent / ".env"
+if _backend_env.exists():
+    load_dotenv(dotenv_path=_backend_env)
 load_dotenv()
 
 class Settings(BaseModel):
@@ -32,7 +37,7 @@ class Settings(BaseModel):
 
     # OpenRouter
     openrouter_api_key: str = ""
-    openrouter_model: str = "google/gemma-2-9b-it:free"
+    openrouter_model: str = "openrouter/free"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_site_url: str = "http://localhost:3000"
     openrouter_site_name: str = "Axion Workspace"

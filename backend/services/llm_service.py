@@ -151,9 +151,8 @@ async def stream_completion(
 
             return
         except Exception as exc:
-            # Only fall back on rate-limit / transient upstream issues.
-            if _is_openrouter_rate_limit(exc):
-                logger.warning("openrouter_rate_limited_falling_back", error=str(exc))
+            if settings.cohere_api_key:
+                logger.warning("openrouter_failed_falling_back_to_cohere", error=str(exc))
             else:
                 raise
 
