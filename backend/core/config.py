@@ -31,13 +31,14 @@ class Settings(BaseModel):
     rag_chunk_overlap_tokens: int = 100
     rag_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     rag_reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    rag_enable_reranker: bool = False
     rag_retrieval_top_k: int = 5
     rag_vector_candidates: int = 14
     rag_keyword_candidates: int = 14
 
     # OpenRouter
     openrouter_api_key: str = ""
-    openrouter_model: str = "openrouter/free"
+    openrouter_model: str = "google/gemini-2.0-flash-lite-001"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_site_url: str = "http://localhost:3000"
     openrouter_site_name: str = "Axion Workspace"
@@ -49,8 +50,8 @@ class Settings(BaseModel):
     cohere_base_url: str = "https://api.cohere.com/v2"
 
     # Preferred LLM provider order for streaming chat.
-    # Supported: openrouter, cohere
-    llm_fallback_order: list[str] = ["openrouter", "cohere"]
+    # Supported: cohere, openrouter
+    llm_fallback_order: list[str] = ["cohere", "openrouter"]
 
     @field_validator("cors_allow_origins", mode="before")
     @classmethod

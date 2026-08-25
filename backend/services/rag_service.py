@@ -268,6 +268,13 @@ class RagService:
         if not candidate_indices:
             return []
 
+        if not getattr(self._settings, "rag_enable_reranker", False):
+            return sorted(
+                ((idx, fallback_scores.get(idx, 0.0)) for idx in candidate_indices),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+
         try:
             reranker = self._load_reranker_model()
             pairs = [(query, chunks[idx].text) for idx in candidate_indices]
