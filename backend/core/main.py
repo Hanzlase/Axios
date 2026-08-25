@@ -22,6 +22,7 @@ logger = structlog.get_logger()
 
 
 def create_app() -> FastAPI:
+    """Create and configure the Axion FastAPI application instance."""
     settings = get_settings()
     configure_logging(settings.log_level)
 
