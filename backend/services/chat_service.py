@@ -205,7 +205,7 @@ class ChatService:
             "X-Title": self._settings.openrouter_site_name,
         }
 
-        timeout = httpx.Timeout(connect=20.0, read=None, write=20.0, pool=20.0)
+        timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
         endpoint = f"{self._settings.openrouter_base_url}/chat/completions"
 
         async with httpx.AsyncClient(timeout=timeout) as client:
@@ -223,9 +223,7 @@ class ChatService:
                     )
 
                 async for line in response.aiter_lines():
-                    if not line:
-                        continue
-                    if not line.startswith("data:"):
+                    if not line or not line.startswith("data:"):
                         continue
 
                     payload_raw = line.removeprefix("data:").strip()
@@ -251,10 +249,8 @@ class ChatService:
         retrieved_context: str,
         history: list[ChatMessage] | None = None,
     ) -> AsyncIterator[str]:
-        # Cohere v2 streaming uses SSE. We'll parse JSON payloads and emit text deltas.
         messages = self._build_messages(user_message, retrieved_context, history)
 
-        # Map OpenAI-style messages into a single prompt for Cohere.
         system = ""
         user = ""
         for m in messages:
@@ -278,7 +274,7 @@ class ChatService:
         }
 
         endpoint = f"{self._settings.cohere_base_url}/chat"
-        timeout = httpx.Timeout(connect=20.0, read=None, write=20.0, pool=20.0)
+        timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
 
         async with httpx.AsyncClient(timeout=timeout) as client:
             async with client.stream("POST", endpoint, headers=headers, json=payload) as response:
@@ -287,61 +283,52 @@ class ChatService:
                     detail = body.decode("utf-8", errors="replace")
                     raise RuntimeError(f"Cohere error {response.status_code}: {detail[:1000]}")
 
-                data_lines: list[str] = []
                 saw_any_text = False
 
                 async for line in response.aiter_lines():
-                    if line is None:
+                    if not line or not line.startswith("data:"):
                         continue
 
-                    # Ignore event lines; we rely on the JSON 'type' field.
-                    if line.startswith("event:"):
+                    raw = line.removeprefix("data:").strip()
+                    if not raw or raw == "[DONE]":
+                        break
+
+                    try:
+                        parsed = json.loads(raw)
+                    except json.JSONDecodeError:
                         continue
 
-                    if line.startswith("data:"):
-                        data_lines.append(line.removeprefix("data:").strip())
-                        continue
+                    delta_text: str | None = None
+                    if isinstance(parsed, dict):
+                        ptype = parsed.get("type")
+                        delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
 
-                    # Blank line => end of SSE event block.
-                    if line == "":
-                        if not data_lines:
-                            continue
+                        if ptype in {"content-delta", "content_delta", "text-generation"}:
+                            msg_obj = delta.get("message")
+                            if isinstance(msg_obj, dict):
+                                content_obj = msg_obj.get("content")
+                                if isinstance(content_obj, dict):
+                                    delta_text = content_obj.get("text")
+                                elif isinstance(content_obj, str):
+                                    delta_text = content_obj
 
-                        raw = "\n".join(data_lines).strip()
-                        data_lines = []
-
-                        if not raw or raw == "[DONE]":
-                            break
-
-                        try:
-                            parsed = json.loads(raw)
-                        except json.JSONDecodeError:
-                            continue
-
-                        delta_text: str | None = None
-                        if isinstance(parsed, dict):
-                            ptype = parsed.get("type")
-                            delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
-
-                            if ptype in {"content_delta", "text-generation"}:
+                            if delta_text is None:
                                 delta_text = delta.get("text") or delta.get("content")
 
-                            if delta_text is None and ptype in {"message_delta", "message"}:
-                                content = delta.get("content") or (parsed.get("message") or {}).get("content")
-                                if isinstance(content, list) and content:
-                                    first = content[0]
-                                    if isinstance(first, dict):
-                                        delta_text = first.get("text") or first.get("delta")
+                        if delta_text is None and ptype in {"message_delta", "message"}:
+                            content = delta.get("content") or (parsed.get("message") or {}).get("content")
+                            if isinstance(content, list) and content:
+                                first = content[0]
+                                if isinstance(first, dict):
+                                    delta_text = first.get("text") or first.get("delta")
 
-                            if delta_text is None and isinstance(parsed.get("text"), str):
-                                delta_text = parsed.get("text")
+                        if delta_text is None and isinstance(parsed.get("text"), str):
+                            delta_text = parsed.get("text")
 
-                        if delta_text:
-                            saw_any_text = True
-                            yield str(delta_text)
+                    if delta_text:
+                        saw_any_text = True
+                        yield str(delta_text)
 
-                # If Cohere returned 200 but we never extracted any streamed text,
-                # fall back to a non-streaming call to guarantee an answer.
                 if not saw_any_text:
                     try:
                         non_stream_payload = {**payload, "stream": False}
@@ -353,7 +340,6 @@ class ChatService:
 
                         final_text: str | None = None
                         if isinstance(parsed, dict):
-                            # Common: {"message": {"content": [{"type":"text","text":"..."}]}}
                             msg = parsed.get("message") or {}
                             content = msg.get("content")
                             if isinstance(content, list) and content:
@@ -361,7 +347,6 @@ class ChatService:
                                 if isinstance(first, dict) and isinstance(first.get("text"), str):
                                     final_text = first.get("text")
 
-                            # Fallbacks
                             if final_text is None and isinstance(parsed.get("text"), str):
                                 final_text = parsed.get("text")
                             if final_text is None and isinstance(parsed.get("response"), str):
@@ -370,7 +355,6 @@ class ChatService:
                         if final_text:
                             yield str(final_text)
                     except Exception:
-                        # If even non-streaming fails, we leave it to caller which will emit error.
                         logger.exception("cohere_non_stream_fallback_failed")
 
 

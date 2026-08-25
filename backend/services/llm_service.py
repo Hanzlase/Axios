@@ -32,14 +32,14 @@ async def _cohere_stream_completion(
         "temperature": temperature,
     }
     if max_tokens is not None:
-        payload["max_tokens"] = max_tokens
+        payload["max_tokens"] = min(max_tokens, 4000)
 
     headers = {
         "Authorization": f"Bearer {settings.cohere_api_key}",
         "Content-Type": "application/json",
     }
     endpoint = f"{settings.cohere_base_url}/chat"
-    timeout = httpx.Timeout(connect=15.0, read=60.0, write=15.0, pool=15.0)
+    timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         async with client.stream("POST", endpoint, headers=headers, json=payload) as response:
@@ -52,14 +52,37 @@ async def _cohere_stream_completion(
                 if not line or not line.startswith("data:"):
                     continue
                 raw = line.removeprefix("data:").strip()
-                if not raw:
-                    continue
+                if not raw or raw == "[DONE]":
+                    break
                 try:
                     parsed = json.loads(raw)
-                    if parsed.get("type") == "content-delta":
-                        delta = parsed.get("delta", {}).get("message", {}).get("content", {})
-                        if isinstance(delta, dict) and "text" in delta:
-                            yield str(delta["text"])
+                    if isinstance(parsed, dict):
+                        ptype = parsed.get("type")
+                        delta = parsed.get("delta") if isinstance(parsed.get("delta"), dict) else {}
+                        delta_text: str | None = None
+                        if ptype in {"content-delta", "content_delta", "text-generation"}:
+                            msg_obj = delta.get("message")
+                            if isinstance(msg_obj, dict):
+                                content_obj = msg_obj.get("content")
+                                if isinstance(content_obj, dict):
+                                    delta_text = content_obj.get("text")
+                                elif isinstance(content_obj, str):
+                                    delta_text = content_obj
+                            if delta_text is None:
+                                delta_text = delta.get("text") or delta.get("content")
+
+                        if delta_text is None and ptype in {"message_delta", "message"}:
+                            content = delta.get("content") or (parsed.get("message") or {}).get("content")
+                            if isinstance(content, list) and content:
+                                first = content[0]
+                                if isinstance(first, dict):
+                                    delta_text = first.get("text") or first.get("delta")
+
+                        if delta_text is None and isinstance(parsed.get("text"), str):
+                            delta_text = parsed.get("text")
+
+                        if delta_text:
+                            yield str(delta_text)
                 except Exception:
                     continue
 
@@ -93,7 +116,7 @@ async def _openrouter_stream_completion(
         "X-Title": settings.openrouter_site_name,
     }
 
-    timeout = httpx.Timeout(connect=15.0, read=60.0, write=15.0, pool=15.0)
+    timeout = httpx.Timeout(connect=10.0, read=30.0, write=10.0, pool=10.0)
     endpoint = f"{settings.openrouter_base_url}/chat/completions"
 
     async with httpx.AsyncClient(timeout=timeout) as client:

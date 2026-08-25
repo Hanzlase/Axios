@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import AsyncIterator
 
 import structlog
@@ -44,14 +45,7 @@ class QuizAgent:
         try:
             yield sse_payload({"type": "status", "value": "generating"})
 
-            for bi, n_q in enumerate(batches, start=1):
-                yield sse_payload(
-                    {
-                        "type": "status",
-                        "value": f"generating_batch_{bi}_of_{len(batches)}",
-                    }
-                )
-
+            async def _generate_batch(n_q: int) -> list[dict]:
                 user_prompt = (
                     f"Context:\n{context}\n\n"
                     f"Topic / focus: {message}\n\n"
@@ -60,12 +54,7 @@ class QuizAgent:
                     "'correct' must be only the letter (A, B, C, or D). "
                     "Return ONLY the JSON object."
                 )
-
-                # Conservative token budget per batch (reliability > speed).
-                max_tokens = min(5000, 1000 + (n_q * 450))
-
-                # Light retry: models occasionally stream an empty body/time out mid-stream.
-                raw = ""
+                max_tokens = min(3500, 800 + (n_q * 300))
                 last_exc: Exception | None = None
                 for attempt in range(1, 3):
                     try:
@@ -77,17 +66,17 @@ class QuizAgent:
                         )
                         data = extract_json(raw)
                         batch_questions = data.get("questions") or []
-                        if not batch_questions:
-                            raise ValueError("LLM returned no questions.")
-                        all_questions.extend(batch_questions)
-                        last_exc = None
-                        break
+                        if batch_questions:
+                            return batch_questions
                     except Exception as exc:
                         last_exc = exc
-                        continue
-
-                if last_exc is not None:
+                if last_exc:
                     raise last_exc
+                return []
+
+            results = await asyncio.gather(*[_generate_batch(n_q) for n_q in batches])
+            for batch_qs in results:
+                all_questions.extend(batch_qs)
 
             # Renumber sequentially to avoid duplicate IDs across batches
             normalized: list[dict] = []

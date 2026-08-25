@@ -506,12 +506,6 @@ export default function LandingPage() {
 
           {/* LEFT */}
           <div>
-            <Reveal delayMs={0}>
-              <div className="inline-flex items-center gap-2.5 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3.5 py-1.5 shadow-[var(--ax-shadow-sm)]">
-                <span className="ax-pulse h-1.5 w-1.5 rounded-full bg-[var(--ax-success)]" />
-              </div>
-            </Reveal>
-
             <Reveal delayMs={65}>
               {/* FIX 1: ax-hero-title now uses clamp() via CSS */}
               <h1 className="ax-hero-title ax-fraunces mt-6 font-light leading-[1.06] tracking-[-0.03em]">
