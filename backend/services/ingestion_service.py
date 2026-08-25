@@ -193,6 +193,7 @@ def extract_text_from_file(payload: UploadPayload) -> str:
 
 def process_upload_batch(payloads: list[UploadPayload]) -> None:
     store = get_ingestion_store()
+    session_ids_processed: set[str] = set()
 
     for payload in payloads:
         store.update_file(payload.file_id, status="processing")
@@ -206,6 +207,7 @@ def process_upload_batch(payloads: list[UploadPayload]) -> None:
                 extracted_text=cleaned,
                 processed_at=utc_now_iso(),
             )
+            session_ids_processed.add(payload.session_id)
             logger.info(
                 "file_processed",
                 file_id=payload.file_id,
@@ -226,3 +228,15 @@ def process_upload_batch(payloads: list[UploadPayload]) -> None:
                 filename=payload.filename,
                 session_id=payload.session_id,
             )
+
+    # Eagerly build the RAG vector index for all processed sessions so that the
+    # very first user query doesn't have to wait 30-60s for embedding computation.
+    if session_ids_processed:
+        from services.rag_service import get_rag_service
+        rag = get_rag_service()
+        for session_id in session_ids_processed:
+            try:
+                rag.warm_index(session_id)
+            except Exception:
+                logger.exception("rag_warm_index_failed_after_upload", session_id=session_id)
+

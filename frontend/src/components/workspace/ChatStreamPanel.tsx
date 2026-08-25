@@ -73,7 +73,13 @@ function sourceSummary(sources: ChatSource[] | undefined): string {
   return `${labels.join(", ")}${suffix}`;
 }
 
-const ChatBubble = memo(function ChatBubble({ message }: { message: ChatMessage }) {
+const ChatBubble = memo(function ChatBubble({
+  message,
+  isStreaming,
+}: {
+  message: ChatMessage;
+  isStreaming?: boolean;
+}) {
   if (message.role === "assistant" && !message.content.trim() && !message.sources?.length) {
     return null;
   }
@@ -89,9 +95,14 @@ const ChatBubble = memo(function ChatBubble({ message }: { message: ChatMessage 
       <p className="text-[0.68rem] uppercase tracking-[0.12em] opacity-70">{message.role}</p>
       {message.role === "assistant" ? (
         <div className="mt-1 text-sm">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-            {message.content}
-          </ReactMarkdown>
+          {isStreaming ? (
+            // Render plain text during streaming to avoid ReactMarkdown re-parsing on every token
+            <p className="whitespace-pre-wrap leading-6">{message.content}</p>
+          ) : (
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
       ) : (
         <p className="mt-1 whitespace-pre-wrap text-sm leading-6">{message.content}</p>
@@ -167,10 +178,11 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
     if (flushTimerRef.current !== null) {
       return;
     }
+    // Flush immediately on the next event loop tick (no artificial delay)
     flushTimerRef.current = window.setTimeout(() => {
       flushTimerRef.current = null;
       flushTokenBuffer();
-    }, 42);
+    }, 0);
   }, [flushTokenBuffer]);
 
   useEffect(() => {
@@ -397,7 +409,13 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
               <span className="text-xs text-[var(--ax-text-tertiary)]">Loading history...</span>
             </div>
           ) : (
-            messages.map((message) => <ChatBubble key={message.id} message={message} />)
+          messages.map((message) => (
+            <ChatBubble
+              key={message.id}
+              message={message}
+              isStreaming={isStreaming && message.id === activeAssistantIdRef.current}
+            />
+          ))
           )}
           {showSkeleton && (
             <div className="fade-in max-w-[80%] rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-4">

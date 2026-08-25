@@ -82,8 +82,17 @@ class RagService:
             convert_to_numpy=True,
             normalize_embeddings=True,
             show_progress_bar=False,
+            batch_size=64,
         )
         return embeddings.astype("float32")
+
+    def warm_index(self, session_id: str) -> None:
+        """Pre-build the index for a session in a background thread."""
+        try:
+            self._build_index(session_id)
+            logger.info("rag_index_warmed", session_id=session_id)
+        except Exception:
+            logger.exception("rag_index_warm_failed", session_id=session_id)
 
     def _chunk_text(self, text: str) -> list[str]:
         tokens = _tokenize(text)
