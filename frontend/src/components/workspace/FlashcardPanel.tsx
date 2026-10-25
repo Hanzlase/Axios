@@ -190,20 +190,36 @@ export const FlashcardPanel = memo(function FlashcardPanel({
     [activeSessionId, draft, isLoading, numCards, onToast, persistFlashSnapshot],
   );
 
-  const goTo = (idx: number) => {
+  const goTo = useCallback((idx: number) => {
     const next = Math.max(0, Math.min(cards.length - 1, idx));
     setCurrentIndex(next);
     persistFlashSnapshot({ currentIndex: next });
-  };
+  }, [cards.length, persistFlashSnapshot]);
+
+  useEffect(() => {
+    if (!cards.length) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "ArrowLeft") {
+        goTo(currentIndex - 1);
+      } else if (e.key === "ArrowRight") {
+        goTo(currentIndex + 1);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [cards.length, currentIndex, goTo]);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Card area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col justify-center">
         {!cards.length && !isLoading && (
-          <p className="text-sm text-zinc-400 italic text-center">
-            Enter a topic and generate flashcards. Click a card to flip it.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-sm text-[var(--ax-text-tertiary)] italic">
+              Enter a topic and generate flashcards. Click a card to flip it.
+            </p>
+          </div>
         )}
 
         {isLoading && (
@@ -221,37 +237,34 @@ export const FlashcardPanel = memo(function FlashcardPanel({
               index={currentIndex}
               total={cards.length}
             />
-            {/* Navigation */}
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => goTo(currentIndex - 1)}
-                disabled={currentIndex === 0}
-                className="rounded-lg border border-[var(--ax-border)] px-4 py-2 text-sm font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] disabled:opacity-30"
-              >
-                ← Previous
-              </button>
-              {/* Dot indicators */}
-              <div className="flex gap-1">
-                {cards.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => goTo(i)}
-                    className={`h-1.5 rounded-full transition-all duration-200 ${
-                      i === currentIndex ? "w-4 bg-[var(--ax-accent)]" : "w-1.5 bg-[var(--ax-border-strong)]"
-                    }`}
-                  />
-                ))}
+            {/* Navigation & Progress */}
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => goTo(currentIndex - 1)}
+                  disabled={currentIndex === 0}
+                  className="rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-2 text-xs font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  ← Previous
+                </button>
+                <div className="flex items-center gap-2 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3 py-1 text-xs font-semibold tabular-nums text-[var(--ax-text)]">
+                  <span>{currentIndex + 1}</span>
+                  <span className="text-[var(--ax-text-tertiary)] font-normal">/</span>
+                  <span className="text-[var(--ax-text-secondary)]">{cards.length}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => goTo(currentIndex + 1)}
+                  disabled={currentIndex === cards.length - 1}
+                  className="rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-2 text-xs font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  Next →
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => goTo(currentIndex + 1)}
-                disabled={currentIndex === cards.length - 1}
-                className="rounded-lg border border-[var(--ax-border)] px-4 py-2 text-sm font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] disabled:opacity-30"
-              >
-                Next →
-              </button>
+              <p className="text-[0.68rem] text-[var(--ax-text-tertiary)]">
+                Press Space to flip • Use ← → arrow keys to navigate
+              </p>
             </div>
           </>
         )}

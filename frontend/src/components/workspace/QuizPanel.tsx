@@ -38,27 +38,44 @@ const QuizCard = memo(function QuizCard({
   const correct = q.correct.toUpperCase();
 
   return (
-    <div className="fade-in rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] p-5 shadow-sm">
-      <p className="text-xs uppercase tracking-wider text-[var(--ax-text-tertiary)] mb-2">Q{index + 1}</p>
-      <p className="text-sm font-medium text-[var(--ax-text)] mb-4">{q.question}</p>
+    <div className="fade-in rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] p-5 shadow-[var(--ax-shadow-sm)]">
+      <div className="flex items-center justify-between mb-2.5">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ax-text-tertiary)]">
+          Question {index + 1}
+        </span>
+        {revealed && (
+          <span
+            className={`rounded-full px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider ${
+              chosen === correct
+                ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/25"
+                : "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/25"
+            }`}
+          >
+            {chosen === correct ? "Correct" : "Incorrect"}
+          </span>
+        )}
+      </div>
+      <p className="text-sm font-semibold text-[var(--ax-text)] mb-4 leading-relaxed">
+        {q.question}
+      </p>
       <div className="space-y-2">
         {q.options.map((opt) => {
           const letter = letterFromOption(opt);
           const isChosen = chosen === letter;
           const isCorrect = letter === correct;
           let cls =
-            "w-full rounded-lg border px-4 py-2.5 text-left text-sm transition-all duration-150 cursor-pointer ";
+            "group flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left text-xs sm:text-sm transition-all duration-150 cursor-pointer ";
           if (!revealed) {
             cls += isChosen
-              ? "border-[var(--ax-border-strong)] bg-[var(--ax-surface-raised)] text-[var(--ax-text)]"
-              : "border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] text-[var(--ax-text-secondary)] hover:border-[var(--ax-border-strong)] hover:bg-[var(--ax-surface-raised)]";
+              ? "border-[var(--ax-border-strong)] bg-[var(--ax-surface-raised)] text-[var(--ax-text)] shadow-sm font-medium"
+              : "border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] text-[var(--ax-text-secondary)] hover:border-[var(--ax-border-strong)] hover:bg-[var(--ax-surface-raised)] hover:text-[var(--ax-text)]";
           } else {
             if (isCorrect) {
-              cls += "border-[var(--ax-success)] bg-[var(--ax-success)] text-white font-medium";
+              cls += "border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-300 font-semibold";
             } else if (isChosen && !isCorrect) {
-              cls += "border-[var(--ax-danger)] bg-[var(--ax-danger)] text-white line-through";
+              cls += "border-red-500/50 bg-red-500/10 text-red-700 dark:text-red-300 line-through opacity-85";
             } else {
-              cls += "border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] text-[var(--ax-text-tertiary)]";
+              cls += "border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] opacity-40 text-[var(--ax-text-tertiary)]";
             }
           }
           return (
@@ -68,15 +85,29 @@ const QuizCard = memo(function QuizCard({
               onClick={() => !revealed && onChoose(letter)}
               className={cls}
             >
-              {opt}
+              <span
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.68rem] font-bold transition-colors ${
+                  isChosen && !revealed
+                    ? "bg-[var(--ax-text)] text-[var(--ax-surface)]"
+                    : revealed && isCorrect
+                    ? "bg-green-600 text-white"
+                    : revealed && isChosen && !isCorrect
+                    ? "bg-red-600 text-white"
+                    : "border border-[var(--ax-border-strong)] bg-[var(--ax-surface)] text-[var(--ax-text-secondary)] group-hover:border-[var(--ax-text)]"
+                }`}
+              >
+                {letter}
+              </span>
+              <span className="flex-1">{opt.replace(/^[A-Za-z][.:)]\s*/, "") || opt}</span>
             </button>
           );
         })}
       </div>
       {revealed && q.explanation && (
-        <p className="mt-3 text-xs text-[var(--ax-text-secondary)] border-t border-[var(--ax-border)] pt-2">
-          💡 {q.explanation}
-        </p>
+        <div className="mt-3.5 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-3 text-xs text-[var(--ax-text-secondary)] leading-relaxed">
+          <span className="font-semibold text-[var(--ax-text)] mr-1">Explanation:</span>
+          {q.explanation}
+        </div>
       )}
     </div>
   );
@@ -256,25 +287,38 @@ export const QuizPanel = memo(function QuizPanel({ activeSessionId, onToast }: Q
                 Submit Quiz
               </button>
             ) : (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold text-[var(--ax-text)]">
-                  Score: {score} / {questions.length}
-                </span>
-                <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full border ${
-                    score === questions.length
-                      ? "border-[var(--ax-success)] bg-[var(--ax-success)] text-white"
+              <div className="flex flex-wrap items-center justify-between gap-3 w-full rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] p-3.5 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold tabular-nums text-[var(--ax-text)]">
+                    Score: {score} / {questions.length} ({Math.round((score / questions.length) * 100)}%)
+                  </span>
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                      score === questions.length
+                        ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
+                        : score >= questions.length / 2
+                        ? "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        : "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {score === questions.length
+                      ? "Perfect!"
                       : score >= questions.length / 2
-                        ? "border-[var(--ax-accent)] bg-[var(--ax-accent)] text-[var(--ax-accent-fg)]"
-                        : "border-[var(--ax-danger)] bg-[var(--ax-danger)] text-white"
-                  }`}
-                >
-                  {score === questions.length
-                    ? "Perfect!"
-                    : score >= questions.length / 2
                       ? "Good job"
-                      : "Keep studying"}
-                </span>
+                      : "Review recommended"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAnswers({});
+                    setRevealed(false);
+                    persistQuizSnapshot({ answers: {}, revealed: false });
+                  }}
+                  className="rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-3 py-1.5 text-xs font-medium text-[var(--ax-text)] hover:bg-[var(--ax-surface-raised)] transition-all"
+                >
+                  Retake Quiz
+                </button>
               </div>
             )}
           </div>

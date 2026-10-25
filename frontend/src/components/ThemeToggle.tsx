@@ -14,15 +14,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 /** Compact icon-only toggle used in nav/header bars. */
 export function ThemeToggle({ className = "" }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      return getStoredTheme();
+    }
+    return "light";
+  });
 
   useEffect(() => {
-    setTheme(getStoredTheme());
     // Keep in sync if another tab changes it
     const handler = (e: StorageEvent) => {
       if (e.key === "axion_theme" || e.key === "theme") {
-        setTheme(getStoredTheme());
-        applyTheme(getStoredTheme());
+        const next = getStoredTheme();
+        setTheme(next);
+        applyTheme(next);
       }
     };
     window.addEventListener("storage", handler);
@@ -60,10 +65,21 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
 
 /** Hook for consuming theme in components. */
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      return getStoredTheme();
+    }
+    return "light";
+  });
 
   useEffect(() => {
-    setTheme(getStoredTheme());
+    const handler = (e: StorageEvent) => {
+      if (e.key === "axion_theme" || e.key === "theme") {
+        setTheme(getStoredTheme());
+      }
+    };
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
   }, []);
 
   const toggle = () => {
@@ -74,3 +90,4 @@ export function useTheme() {
 
   return { theme, toggle, isDark: theme === "dark" };
 }
+

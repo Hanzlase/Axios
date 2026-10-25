@@ -92,12 +92,15 @@ const ChatBubble = memo(function ChatBubble({
           : "ml-auto border-[var(--ax-accent)] bg-[var(--ax-accent)] text-[var(--ax-accent-fg)]"
       }`}
     >
-      <p className="text-[0.68rem] uppercase tracking-[0.12em] opacity-70">{message.role}</p>
+      <p className="text-[0.68rem] uppercase tracking-[0.12em] opacity-70 font-mono">{message.role}</p>
       {message.role === "assistant" ? (
         <div className="mt-1 text-sm">
           {isStreaming ? (
             // Render plain text during streaming to avoid ReactMarkdown re-parsing on every token
-            <p className="whitespace-pre-wrap leading-6">{message.content}</p>
+            <p className="whitespace-pre-wrap leading-6">
+              {message.content}
+              <span className="inline-block w-1.5 h-3.5 bg-[var(--ax-text)] ml-1 animate-pulse align-middle rounded-sm" />
+            </p>
           ) : (
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {message.content}
@@ -119,6 +122,13 @@ const ChatBubble = memo(function ChatBubble({
   );
 });
 
+const SUGGESTED_PROMPTS = [
+  "Summarize key findings and takeaways",
+  "Extract definitions and core terminology",
+  "What are the main methodology steps?",
+  "List questions answered by these documents",
+];
+
 export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -134,6 +144,7 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [streamState, setStreamState] = useState<"idle" | "retrieving" | "generating">("idle");
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [activeStreamingMessageId, setActiveStreamingMessageId] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const activeAssistantIdRef = useRef<string | null>(null);
@@ -296,6 +307,7 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
       setShowSkeleton(true);
       setStreamState("retrieving");
       activeAssistantIdRef.current = assistantId;
+      setActiveStreamingMessageId(assistantId);
       tokenBufferRef.current = "";
 
       let receivedToken = false;
@@ -378,6 +390,7 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
 
         setShowSkeleton(false);
         setIsStreaming(false);
+        setActiveStreamingMessageId(null);
         setStreamState("idle");
         activeAssistantIdRef.current = null;
         tokenBufferRef.current = "";
@@ -413,9 +426,29 @@ export function ChatStreamPanel({ activeSessionId, onToast }: ChatStreamPanelPro
             <ChatBubble
               key={message.id}
               message={message}
-              isStreaming={isStreaming && message.id === activeAssistantIdRef.current}
+              isStreaming={isStreaming && message.id === activeStreamingMessageId}
             />
           ))
+          )}
+          {messages.length <= 1 && !isStreaming && (
+            <div className="mt-3 pt-3 border-t border-[var(--ax-border)]">
+              <p className="text-[0.68rem] uppercase tracking-wider font-semibold text-[var(--ax-text-tertiary)] mb-2">
+                Suggested questions:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SUGGESTED_PROMPTS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => setDraft(prompt)}
+                    className="flex items-center justify-between rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-3 py-2 text-xs text-[var(--ax-text-secondary)] hover:text-[var(--ax-text)] hover:border-[var(--ax-border-strong)] hover:bg-[var(--ax-surface-subtle)] transition-all text-left"
+                  >
+                    <span>{prompt}</span>
+                    <span className="text-[var(--ax-text-tertiary)] ml-1">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
           {showSkeleton && (
             <div className="fade-in max-w-[80%] rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-4">

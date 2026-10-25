@@ -37,16 +37,18 @@ function smoothNoise(x: number, y: number, t: number): number {
 function makeParticles(w: number, h: number, isDark: boolean): Dot[] {
   const count = Math.floor((w * h) / 12000); // Increased density (~80-160 particles)
   const dots: Dot[] = [];
+  const baseAlpha = isDark ? 0.25 : 0.15;
   for (let i = 0; i < count; i++) {
     const r = Math.random() * 2.2 + 0.8; // radius 0.8–3.0px
+    const alpha = Math.random() * 0.35 + baseAlpha;
     dots.push({
       x: Math.random() * w,
       y: Math.random() * h,
       vx: (Math.random() - 0.5) * 0.25,
       vy: (Math.random() - 0.5) * 0.25,
       r,
-      alpha: Math.random() * 0.4 + 0.15,
-      targetAlpha: Math.random() * 0.4 + 0.15,
+      alpha,
+      targetAlpha: alpha,
       noiseOffX: Math.random() * 1000,
       noiseOffY: Math.random() * 1000,
     });

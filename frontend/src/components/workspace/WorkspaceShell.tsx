@@ -1,6 +1,6 @@
 "use client";
 
-// Deployment trigger update for Railway
+import Link from "next/link";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -160,6 +160,81 @@ function mapUploadRecordStatus(status: UploadFileRecord["status"]): UploadItemSt
   return "queued";
 }
 
+function DocFileTag({ filename }: { filename: string }) {
+  const ext = extensionFromName(filename);
+  let badgeStyle = "bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border-neutral-500/20";
+  if (ext === "pdf") {
+    badgeStyle = "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25";
+  } else if (ext === "docx") {
+    badgeStyle = "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25";
+  } else if (ext === "txt") {
+    badgeStyle = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25";
+  } else if (ext === "csv") {
+    badgeStyle = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25";
+  }
+  return (
+    <span className={`inline-flex shrink-0 items-center justify-center rounded px-1.5 py-0.5 text-[0.62rem] font-bold tracking-wider uppercase border ${badgeStyle}`}>
+      {ext || "doc"}
+    </span>
+  );
+}
+
+const MODE_ITEMS: { mode: AgentMode; label: string; icon: React.ReactNode }[] = [
+  {
+    mode: "chat",
+    label: "Chat",
+    icon: (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
+    mode: "explain",
+    label: "Explain",
+    icon: (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 16v-4" />
+        <path d="M12 8h.01" />
+      </svg>
+    ),
+  },
+  {
+    mode: "quiz",
+    label: "Quiz",
+    icon: (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    mode: "flashcards",
+    label: "Flashcards",
+    icon: (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      </svg>
+    ),
+  },
+  {
+    mode: "plan",
+    label: "Study Plan",
+    icon: (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+      </svg>
+    ),
+  },
+];
+
 export function WorkspaceShell() {
   const [connection, setConnection] = useState<ConnectionState>("checking");
 
@@ -231,14 +306,23 @@ export function WorkspaceShell() {
     handleSetActiveSession(session.id);
   }, [handleSetActiveSession]);
 
-  const handleRenameSession = useCallback((e: React.MouseEvent, id: string, currentTitle: string) => {
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingSessionTitle, setEditingSessionTitle] = useState("");
+
+  const handleStartRename = useCallback((e: React.MouseEvent, id: string, title: string) => {
     e.stopPropagation();
-    const newTitle = window.prompt("Enter new session name:", currentTitle);
-    if (newTitle && newTitle.trim() !== "" && newTitle !== currentTitle) {
-      renameSession(id, newTitle.trim());
-      setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, title: newTitle.trim() } : s)));
-    }
+    setEditingSessionId(id);
+    setEditingSessionTitle(title);
   }, []);
+
+  const handleFinishRename = useCallback((id: string, oldTitle: string) => {
+    const trimmed = editingSessionTitle.trim();
+    if (trimmed && trimmed !== oldTitle) {
+      renameSession(id, trimmed);
+      setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, title: trimmed } : s)));
+    }
+    setEditingSessionId(null);
+  }, [editingSessionTitle]);
 
   const addToast = useCallback((message: string, variant: ToastVariant) => {
     const id = createId("toast");
@@ -646,32 +730,75 @@ export function WorkspaceShell() {
   }, []);
 
   return (
-    <div className="h-screen overflow-hidden bg-[var(--ax-bg)] text-[var(--ax-text)]">
-      <div className="mx-auto flex h-full max-w-[1800px] flex-col px-3 py-3 sm:px-5 sm:py-5">
-        <header className="mb-3 flex items-center justify-between rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-3 shadow-[var(--ax-shadow)]">
-          <div>
-            <p className="text-[0.7rem] uppercase tracking-[0.16em] text-[var(--ax-text-tertiary)]">
-              Axios
-            </p>
-            <h1 className="text-base font-semibold tracking-tight">
-              AI Workspace Foundation
-            </h1>
-          </div>
+    <div className="h-dvh overflow-hidden bg-[var(--ax-bg)] text-[var(--ax-text)]">
+      <div className="mx-auto flex h-full max-w-[1800px] flex-col px-3 py-3 sm:px-5 sm:py-3">
+        <header className="mb-3 flex items-center justify-between rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-2.5 shadow-[var(--ax-shadow-sm)]">
           <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
+              title="Return to Axios Home"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--ax-text)] transition-transform group-hover:scale-105">
+                <svg
+                  width={14}
+                  height={14}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--ax-accent-fg)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                </svg>
+              </div>
+              <div className="flex items-center">
+                <span className="text-sm font-semibold tracking-tight text-[var(--ax-text)]">
+                  Axios
+                </span>
+                <span className="hidden sm:inline-block ml-2.5 text-[0.68rem] text-[var(--ax-text-tertiary)] border-l border-[var(--ax-border)] pl-2.5 font-medium">
+                  Document Workspace
+                </span>
+              </div>
+            </Link>
+
+            {activeSession && (
+              <div className="hidden md:flex items-center gap-1.5 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-2.5 py-1 text-xs">
+                <span className="text-[var(--ax-text-tertiary)] font-mono text-[0.68rem]">session:</span>
+                <span className="max-w-[160px] truncate font-medium text-[var(--ax-text)]">{activeSession.title}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={handleNewSession}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)]"
+              title="Create a new workspace session"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              <span>New Session</span>
+            </button>
+
             <button
               onClick={toggleTheme}
-              className="rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-2 text-[var(--ax-text-secondary)] hover:bg-[var(--ax-surface-subtle)] hover:text-[var(--ax-text)] transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-2 text-[var(--ax-text-secondary)] hover:text-[var(--ax-text)] transition-colors"
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
               title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             >
               {theme === "light" ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
               )}
             </button>
-            <div className="flex items-center gap-2 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-3 py-1.5 text-xs text-[var(--ax-text-secondary)]">
-              <span className={`h-2 w-2 rounded-full ${statusDotClass(connection)}`} />
-              {connectionLabel(connection)}
+
+            <div className="flex items-center gap-2 rounded-full border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] px-2.5 py-1 text-xs text-[var(--ax-text-secondary)]">
+              <span className={`h-2 w-2 rounded-full ${statusDotClass(connection)} ${connection === "connected" ? "ax-dot-pulse" : ""}`} />
+              <span className="hidden sm:inline capitalize">{connectionLabel(connection)}</span>
             </div>
           </div>
         </header>
@@ -762,9 +889,28 @@ export function WorkspaceShell() {
                       }`}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-medium text-[var(--ax-text)]">
-                          {session.title}
-                        </p>
+                        {editingSessionId === session.id ? (
+                          <input
+                            type="text"
+                            value={editingSessionTitle}
+                            autoFocus
+                            onChange={(e) => setEditingSessionTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleFinishRename(session.id, session.title);
+                              } else if (e.key === "Escape") {
+                                setEditingSessionId(null);
+                              }
+                            }}
+                            onBlur={() => handleFinishRename(session.id, session.title)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full rounded border border-[var(--ax-border-strong)] bg-[var(--ax-surface)] px-1.5 py-0.5 text-xs font-medium text-[var(--ax-text)] focus:outline-none"
+                          />
+                        ) : (
+                          <p className="truncate text-sm font-medium text-[var(--ax-text)]">
+                            {session.title}
+                          </p>
+                        )}
                         <p className="mt-0.5 text-xs text-[var(--ax-text-tertiary)]">
                           {hasMounted
                             ? new Date(session.createdAt).toLocaleDateString(undefined, {
@@ -780,7 +926,7 @@ export function WorkspaceShell() {
                         <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             type="button"
-                            onClick={(e) => handleRenameSession(e, session.id, session.title)}
+                            onClick={(e) => handleStartRename(e, session.id, session.title)}
                             className="rounded p-1 text-[var(--ax-text-tertiary)] hover:bg-[var(--ax-surface-raised)] hover:text-[var(--ax-text)]"
                             title="Rename Session"
                           >
@@ -820,16 +966,21 @@ export function WorkspaceShell() {
                           : "border-transparent hover:border-[var(--ax-border)] hover:bg-[var(--ax-surface-subtle)]"
                       }`}
                     >
-                      <p className="truncate text-sm font-medium text-[var(--ax-text)]">
-                        {document.name}
-                      </p>
-                      <span
-                        className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-[0.1em] ${statusBadgeClass(
-                          document.status,
-                        )}`}
-                      >
-                        {document.status}
-                      </span>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <DocFileTag filename={document.name} />
+                          <span className="truncate text-xs font-medium text-[var(--ax-text)]">
+                            {document.name}
+                          </span>
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-medium uppercase tracking-[0.08em] ${statusBadgeClass(
+                            document.status,
+                          )}`}
+                        >
+                          {document.status}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -1050,9 +1201,28 @@ export function WorkspaceShell() {
                     }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-medium text-[var(--ax-text)]">
-                        {session.title}
-                      </p>
+                      {editingSessionId === session.id ? (
+                        <input
+                          type="text"
+                          value={editingSessionTitle}
+                          autoFocus
+                          onChange={(e) => setEditingSessionTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleFinishRename(session.id, session.title);
+                            } else if (e.key === "Escape") {
+                              setEditingSessionId(null);
+                            }
+                          }}
+                          onBlur={() => handleFinishRename(session.id, session.title)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full rounded border border-[var(--ax-border-strong)] bg-[var(--ax-surface)] px-1.5 py-0.5 text-xs font-medium text-[var(--ax-text)] focus:outline-none"
+                        />
+                      ) : (
+                        <p className="truncate text-sm font-medium text-[var(--ax-text)]">
+                          {session.title}
+                        </p>
+                      )}
                       <p className="mt-0.5 text-xs text-[var(--ax-text-tertiary)]">
                         {hasMounted
                           ? new Date(session.createdAt).toLocaleDateString(undefined, {
@@ -1068,7 +1238,7 @@ export function WorkspaceShell() {
                       <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           type="button"
-                          onClick={(e) => handleRenameSession(e, session.id, session.title)}
+                          onClick={(e) => handleStartRename(e, session.id, session.title)}
                           className="rounded p-1 text-[var(--ax-text-tertiary)] hover:bg-[var(--ax-surface-raised)] hover:text-[var(--ax-text)]"
                           title="Rename Session"
                         >
@@ -1108,16 +1278,21 @@ export function WorkspaceShell() {
                         : "border-transparent hover:border-[var(--ax-border)] hover:bg-[var(--ax-surface-subtle)]"
                     }`}
                   >
-                    <p className="truncate text-sm font-medium text-[var(--ax-text)]">
-                      {document.name}
-                    </p>
-                    <span
-                      className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-[0.1em] ${statusBadgeClass(
-                        document.status,
-                      )}`}
-                    >
-                      {document.status}
-                    </span>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <DocFileTag filename={document.name} />
+                        <span className="truncate text-xs font-medium text-[var(--ax-text)]">
+                          {document.name}
+                        </span>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-medium uppercase tracking-[0.08em] ${statusBadgeClass(
+                          document.status,
+                        )}`}
+                      >
+                        {document.status}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -1128,6 +1303,35 @@ export function WorkspaceShell() {
 
           {/* MIDDLE SECTION - Mode-aware panel */}
           <section className="ax-panel flex min-h-0 flex-col overflow-hidden relative">
+            {/* Top Toolbar: Mode Switcher & Export */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-2">
+              <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-1">
+                {MODE_ITEMS.map((item) => (
+                  <button
+                    key={item.mode}
+                    type="button"
+                    onClick={() => handleSetActiveMode(item.mode)}
+                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150 ${
+                      activeMode === item.mode
+                        ? "border border-[var(--ax-border)] bg-[var(--ax-surface)] font-semibold text-[var(--ax-text)] shadow-sm"
+                        : "text-[var(--ax-text-secondary)] hover:bg-[var(--ax-surface)]/50 hover:text-[var(--ax-text)]"
+                    }`}
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                {activeSessionId && (
+                  <ExportButton
+                    activeSessionId={activeSessionId}
+                    contentType={activeMode === "quiz" || activeMode === "flashcards" || activeMode === "plan" ? activeMode : "chat"}
+                    onToast={addToast}
+                  />
+                )}
+              </div>
+            </div>
             {activeMode === "chat" && (
               <ChatStreamPanel
                 key={`chat-${activeSessionId}`}
@@ -1311,21 +1515,56 @@ export function WorkspaceShell() {
             </div>
 
             <div className="px-5 py-4">
-              <p className="text-[0.68rem] uppercase tracking-[0.12em] text-[var(--ax-text-tertiary)]">
-                Document Focus
-              </p>
-              <div className="mt-3 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[0.68rem] uppercase tracking-[0.12em] text-[var(--ax-text-tertiary)]">
+                  Document Focus
+                </p>
+                {activeDocument && (
+                  <span className={`rounded-full border px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider ${statusBadgeClass(activeDocument.status)}`}>
+                    {activeDocument.status}
+                  </span>
+                )}
+              </div>
+              <div className="mt-2.5 rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface-subtle)] p-3.5 transition-all">
                 {activeDocument ? (
-                  <>
-                    <p className="text-sm font-medium text-[var(--ax-text)]">{activeDocument.name}</p>
-                    <p className="mt-1 text-sm text-[var(--ax-text-secondary)]">
-                      Context panel is staged for references, citations, and chunk previews.
-                    </p>
-                  </>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2.5">
+                      <DocFileTag filename={activeDocument.name} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-[var(--ax-text)] leading-snug break-words">
+                          {activeDocument.name}
+                        </p>
+                        <p className="text-[0.7rem] text-[var(--ax-text-tertiary)] mt-0.5">
+                          Indexed for RAG citations and agent synthesis
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[var(--ax-border)] grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleSetActiveMode("chat")}
+                        className="flex items-center justify-center gap-1.5 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--ax-text)] hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)] transition-all"
+                      >
+                        <svg className="w-3 h-3 text-[var(--ax-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span>Ask in Chat</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSetActiveMode("quiz")}
+                        className="flex items-center justify-center gap-1.5 rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--ax-text)] hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)] transition-all"
+                      >
+                        <svg className="w-3 h-3 text-[var(--ax-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span>Quiz Me</span>
+                      </button>
+                    </div>
+                  </div>
                 ) : (
-                  <p className="text-sm text-[var(--ax-text-secondary)]">
-                    Upload and select a document to view focused context.
-                  </p>
+                  <div className="text-center py-2">
+                    <p className="text-xs text-[var(--ax-text-tertiary)]">
+                      Select any document in the list to inspect citations and launch targeted actions.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

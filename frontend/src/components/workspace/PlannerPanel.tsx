@@ -85,13 +85,13 @@ export const PlannerPanel = memo(function PlannerPanel({
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Plan output */}
       <div className="flex-1 overflow-y-auto px-5 py-5">
-        {!schedule.length && !isLoading && (
+        {!schedule.length && !isLoading && !isRestoring && (
           <p className="text-sm text-[var(--ax-text-tertiary)] italic">
             Describe what you want to learn and over how many days. A structured plan will appear here.
           </p>
         )}
 
-        {isLoading && (
+        {(isLoading || isRestoring) && (
           <div className="space-y-3 fade-in">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl border border-[var(--ax-border)] bg-[var(--ax-surface)] p-4 space-y-2">

@@ -89,6 +89,35 @@ body {
   border-radius: 0.875rem;
   background: var(--ax-surface);
   box-shadow: var(--ax-shadow);
+  transition: border-color var(--ax-transition);
+}
+
+.ax-glass {
+  background: color-mix(in srgb, var(--ax-surface) 86%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--ax-border);
+}
+
+.ax-card-interactive {
+  border: 1px solid var(--ax-border);
+  border-radius: 0.75rem;
+  background: var(--ax-surface);
+  box-shadow: var(--ax-shadow-sm);
+  transition: transform var(--ax-transition), border-color var(--ax-transition), box-shadow var(--ax-transition);
+}
+.ax-card-interactive:hover {
+  border-color: var(--ax-border-strong);
+  box-shadow: var(--ax-shadow);
+  transform: translateY(-1px);
+}
+
+@keyframes axDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+.ax-dot-pulse {
+  animation: axDotPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* ─── Scrollbar ───────────────────────────────────────────── */
