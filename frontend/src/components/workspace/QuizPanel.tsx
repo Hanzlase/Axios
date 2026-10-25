@@ -149,7 +149,7 @@ export const QuizPanel = memo(function QuizPanel({ activeSessionId, onToast }: Q
         }
       })
       .catch(() => {
-        /* server offline — fine */
+        /* server offline (ignored) */
       });
 
     return () => window.clearTimeout(timer);

@@ -1576,7 +1576,7 @@ export function WorkspaceShell() {
           </div>
           {connection === "connected" && backendMeta && (
             <div>
-              <span>API: {backendMeta.name} (v{backendMeta.version}) • {backendMeta.env}</span>
+              <span>API: {backendMeta.name} (v{backendMeta.version}) / {backendMeta.env}</span>
             </div>
           )}
         </footer>

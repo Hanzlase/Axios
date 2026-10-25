@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react";
 /**
  * Physics-inspired particle field.
  *
- * Particles float in zero-gravity — continuous slow drift with organic
+ * Particles float in zero-gravity with continuous slow drift and organic
  * noise-based velocity changes. They gently repel the cursor within a
- * soft radius. No springs, no anchors — pure free-floating feel.
+ * soft radius without springs or anchors.
  *
  * Intentionally low density and monochromatic to match the premium design
  * language (matches --ax-text at low opacity).
@@ -116,13 +116,13 @@ export function ParticleField() {
       drawConnections(dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.18)");
 
       for (const dot of dots) {
-        // Organic noise-based drift — no anchors
+        // Organic noise-based drift without anchors
         const nx = smoothNoise(dot.noiseOffX, dot.noiseOffY, t);
         const ny = smoothNoise(dot.noiseOffY, dot.noiseOffX, t + 100);
         dot.vx += nx * 0.006;
         dot.vy += ny * 0.006;
 
-        // Cursor repulsion — soft, no snapping
+        // Cursor repulsion: soft, no snapping
         const cdx = dot.x - mouseX;
         const cdy = dot.y - mouseY;
         const cd = Math.sqrt(cdx * cdx + cdy * cdy);

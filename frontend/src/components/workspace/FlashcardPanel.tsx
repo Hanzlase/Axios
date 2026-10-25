@@ -259,11 +259,11 @@ export const FlashcardPanel = memo(function FlashcardPanel({
                   disabled={currentIndex === cards.length - 1}
                   className="rounded-lg border border-[var(--ax-border)] bg-[var(--ax-surface)] px-4 py-2 text-xs font-medium text-[var(--ax-text)] transition-all hover:bg-[var(--ax-surface-subtle)] hover:border-[var(--ax-border-strong)] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  Next →
+                  Next
                 </button>
               </div>
               <p className="text-[0.68rem] text-[var(--ax-text-tertiary)]">
-                Press Space to flip • Use ← → arrow keys to navigate
+                Press Space to flip. Use arrow keys to navigate.
               </p>
             </div>
           </>
